@@ -61,10 +61,27 @@
 
       <gux-button id="generateBtn" accent="primary">Generate</gux-button>
     </fieldset>
+
+    <!-- Load the PureCloud platform client library -->
+    <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
+
     <script>
       // wait for dom to load
       document.addEventListener("DOMContentLoaded", function () {
-        var platformClient = window.require("platformClient");
+        // define redirect url
+        const redirectUrl =
+          "https://apmaries.github.io/raa-ltf/widget.html?gcHostOrigin={{gcHostOrigin}}&gcTargetEnv={{gcTargetEnv}}";
+
+        // create an instance of the platform client
+        const client = platformClient.ApiClient.instance;
+        let myClientApp = new ClientApp({
+          gcHostOriginQueryParam: "gcHostOrigin",
+          gcTargetEnvQueryParam: "gcTargetEnv",
+        });
+
+        myClientApp.alerting.showToastPopup("Hello", "Genesys Cloud");
+
+        /*var platformClient = window.require("platformClient");
 
         var clientEnvironment = document.getElementById(
           "clientEnvironmentInput"
@@ -74,6 +91,7 @@
 
         authenticateButton.addEventListener("click", function () {
           var client = platformClient.ApiClient.instance;
+          client.setEnvironment;
           client.setEnvironment(clientEnvironment.value);
           client.setPersistSettings(true, "wpt");
 
@@ -87,7 +105,7 @@
           } catch (e) {
             console.error("WPT: Error logging in", e);
           }
-        });
+        });*/
       });
     </script>
   </body>
