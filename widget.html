@@ -61,5 +61,34 @@
 
       <gux-button id="generateBtn" accent="primary">Generate</gux-button>
     </fieldset>
+    <script>
+      // wait for dom to load
+      document.addEventListener("DOMContentLoaded", function () {
+        var platformClient = window.require("platformClient");
+
+        var clientEnvironment = document.getElementById(
+          "clientEnvironmentInput"
+        );
+        var clientId = document.getElementById("clientIdInput");
+        var authenticateButton = document.getElementById("authenticate-button");
+
+        authenticateButton.addEventListener("click", function () {
+          var client = platformClient.ApiClient.instance;
+          client.setEnvironment(clientEnvironment.value);
+          client.setPersistSettings(true, "wpt");
+
+          try {
+            client.loginImplicitGrant(
+              clientId.value,
+              "https://apmaries.github.io/wpt/wpt-home.html"
+            );
+            sessionStorage.setItem("client_id", clientId.value);
+            sessionStorage.setItem("client_env", clientEnvironment.value);
+          } catch (e) {
+            console.error("WPT: Error logging in", e);
+          }
+        });
+      });
+    </script>
   </body>
 </html>
