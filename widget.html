@@ -31,7 +31,7 @@
         <gux-dropdown
           id="businessUnit"
           filter-type="starts-with"
-          placeholder="Select a thing"
+          placeholder="Select a Business Unit"
         >
           <gux-listbox
             id="business-unit-listbox"
@@ -49,7 +49,7 @@
         <gux-dropdown
           id="forecast"
           filter-type="starts-with"
-          placeholder="Select a thing"
+          placeholder="Select a long term forecast"
         >
           <gux-listbox id="forecast-listbox" aria-label="Forecast Selection">
             <gux-option value="a">Ant</gux-option>
@@ -68,44 +68,22 @@
     <script>
       // wait for dom to load
       document.addEventListener("DOMContentLoaded", function () {
-        // define redirect url
-        const redirectUrl =
-          "https://apmaries.github.io/raa-ltf/widget.html?gcHostOrigin={{gcHostOrigin}}&gcTargetEnv={{gcTargetEnv}}";
+        var platformClient = window.require("platformClient");
 
-        // create an instance of the platform client
-        const client = platformClient.ApiClient.instance;
-        let myClientApp = new ClientApp({
-          gcHostOriginQueryParam: "gcHostOrigin",
-          gcTargetEnvQueryParam: "gcTargetEnv",
-        });
+        var clientId = "4c89c35c-d1ec-4fad-91f5-240d37b4d546";
 
-        myClientApp.alerting.showToastPopup("Hello", "Genesys Cloud");
+        var client = platformClient.ApiClient.instance;
+        client.setEnvironment("usw2.pure.cloud");
+        client.setPersistSettings(true, "ltf-widget");
 
-        /*var platformClient = window.require("platformClient");
-
-        var clientEnvironment = document.getElementById(
-          "clientEnvironmentInput"
-        );
-        var clientId = document.getElementById("clientIdInput");
-        var authenticateButton = document.getElementById("authenticate-button");
-
-        authenticateButton.addEventListener("click", function () {
-          var client = platformClient.ApiClient.instance;
-          client.setEnvironment;
-          client.setEnvironment(clientEnvironment.value);
-          client.setPersistSettings(true, "wpt");
-
-          try {
-            client.loginImplicitGrant(
-              clientId.value,
-              "https://apmaries.github.io/wpt/wpt-home.html"
-            );
-            sessionStorage.setItem("client_id", clientId.value);
-            sessionStorage.setItem("client_env", clientEnvironment.value);
-          } catch (e) {
-            console.error("WPT: Error logging in", e);
-          }
-        });*/
+        try {
+          client.loginImplicitGrant(
+            clientId.value,
+            "https://apmaries.github.io/raa-ltf/widget.html"
+          );
+        } catch (e) {
+          console.error("LTF: Error logging in", e);
+        }
       });
     </script>
   </body>
