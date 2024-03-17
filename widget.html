@@ -14,7 +14,7 @@
     ></script>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="/widget/src/script.js"></script>
 
     <style>
       .dropdown {
@@ -78,7 +78,7 @@
 
         try {
           client.loginImplicitGrant(
-            clientId.value,
+            clientId,
             "https://apmaries.github.io/raa-ltf/widget.html"
           );
         } catch (e) {
