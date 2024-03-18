@@ -87,6 +87,7 @@
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
         const client = window.client;
+        const wfmApi = client.WorkforceManagementApi();
         const buListbox = document.getElementById("business-unit-listbox");
         const forecastListbox = document.getElementById("forecast-listbox");
 
@@ -119,7 +120,7 @@
           // function to get business units
           async function getBusinessUnits() {
             // Get business units to populate dropdown
-            return client
+            return wfmApi
               .getWorkforcemanagementBusinessunits()
               .then((data) => {
                 console.log("LTF: Business Units = ", data);
@@ -150,8 +151,19 @@
           // Get long term forecast objects to populate dropdown
         }
 
-        function generate() {
-          // Add your generate logic here
+        async function generate() {
+          // Function to get forecast data for selected forecast
+          async function getForecastData() {
+            // Get forecast data
+          }
+
+          // Temp function to load forecastData.json
+          async function loadForecastData() {
+            // Load forecast data
+            const response = await fetch("/raa-ltf/.test/forecastData.json");
+            console.log("LTF: Test data loaded");
+            return response.json();
+          }
         }
 
         // main
