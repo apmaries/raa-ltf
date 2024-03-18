@@ -18,9 +18,8 @@ buListbox.addEventListener("change", (event) => {
   // Remove <!----> if found in selectedBuName
   selectedBuName = selectedBuName.replace(/<!---->/g, "");
 
-  terminal(
-    "INFO",
-    `Selected business unit: ${selectedBuName} (${selectedBuId})`
+  console.log(
+    `LTF: Selected business unit: ${selectedBuName} (${selectedBuId})`
   );
 });
 
@@ -37,7 +36,13 @@ function init() {
     a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
   );
 
-  businessUnits.array.forEach((element) => {});
+  businessUnits.array.forEach((item) => {
+    const option = document.createElement("gux-option");
+    option.value = item.id;
+    option.name = item.name;
+    option.innerHTML = item.name;
+    dropdown.appendChild(option);
+  });
 }
 
 async function getForecasts() {
@@ -47,3 +52,6 @@ async function getForecasts() {
 function generate() {
   // Add your generate logic here
 }
+
+// main
+init();
