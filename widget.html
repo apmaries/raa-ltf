@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Widget</title>
+
+    <link
+      href="https://dhqbrvplips7x.cloudfront.net/common-ui-docs/genesys-webcomponents/3.8.1-178/genesys-webcomponents/genesys-webcomponents.css"
+      rel="stylesheet"
+    />
+
+    <script
+      type="module"
+      src="https://dhqbrvplips7x.cloudfront.net/common-ui-docs/genesys-webcomponents/3.8.1-178/genesys-webcomponents/genesys-webcomponents.esm.js"
+    ></script>
+    <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
+
+    <script type="module" src="./src/script.js"></script>
+    <script type="module" src="./src/erlangXL97.js"></script>
+
+    <style>
+      .dropdown {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <fieldset>
+      <h1>RAA Long Term Forecast</h1>
+
+      <div class="dropdown">
+        <label for="businessUnit">Business Unit:</label>
+        <gux-dropdown
+          id="businessUnit"
+          filter-type="starts-with"
+          placeholder="Select a Business Unit"
+        >
+          <gux-listbox
+            id="business-unit-listbox"
+            aria-label="Business Unit Selection"
+          >
+            <gux-option value="a">Ant</gux-option>
+            <gux-option value="b">Bat</gux-option>
+            <gux-option value="c">Cat</gux-option>
+          </gux-listbox>
+        </gux-dropdown>
+      </div>
+
+      <div class="dropdown">
+        <label for="forecast">Forecast:</label>
+        <gux-dropdown
+          id="forecast"
+          filter-type="starts-with"
+          placeholder="Select a long term forecast"
+        >
+          <gux-listbox id="forecast-listbox" aria-label="Forecast Selection">
+            <gux-option value="a">Ant</gux-option>
+            <gux-option value="b">Bat</gux-option>
+            <gux-option value="c">Cat</gux-option>
+          </gux-listbox>
+        </gux-dropdown>
+      </div>
+
+      <gux-button id="generateBtn" accent="primary">Generate</gux-button>
+    </fieldset>
+
+    <!-- Load the PureCloud platform client library -->
+    <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
+
+    <script>
+      // wait for dom to load
+      document.addEventListener("DOMContentLoaded", function () {
+        var platformClient = window.require("platformClient");
+
+        var clientId = "4c89c35c-d1ec-4fad-91f5-240d37b4d546";
+
+        var client = platformClient.ApiClient.instance;
+        client.setEnvironment("usw2.pure.cloud");
+        client.setPersistSettings(true, "ltf-widget");
+
+        try {
+          client.loginImplicitGrant(
+            clientId,
+            "https://apmaries.github.io/raa-ltf/widget.html"
+          );
+        } catch (e) {
+          console.error("LTF: Error logging in", e);
+        }
+      });
+    </script>
+  </body>
+</html>
