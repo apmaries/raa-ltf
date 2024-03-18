@@ -35,9 +35,7 @@
             id="business-unit-listbox"
             aria-label="Business Unit Selection"
           >
-            <gux-option value="a">Ant</gux-option>
-            <gux-option value="b">Bat</gux-option>
-            <gux-option value="c">Cat</gux-option>
+            <!-- BU objects will be added dynamically -->
           </gux-listbox>
         </gux-dropdown>
       </div>
@@ -101,52 +99,7 @@
         const buListbox = document.getElementById("business-unit-listbox");
         const forecastListbox = document.getElementById("forecast-listbox");
 
-        // Event listener for bu-listbox
-        let selectedBuId;
-        let selectedBuName;
-        buListbox.addEventListener("change", (event) => {
-          selectedBuId = event.target.value;
-
-          // Get the selected gux-option's innerHTML
-          var selectedOption = Array.from(
-            buListbox.querySelectorAll("gux-option")
-          ).find((option) => option.value === selectedBuId);
-          selectedBuName = selectedOption ? selectedOption.innerHTML : "";
-
-          // Remove <!----> if found in selectedBuName
-          selectedBuName = selectedBuName.replace(/<!---->/g, "");
-
-          console.log(
-            `[LTF] Selected business unit: ${selectedBuId} (${selectedBuName})`
-          );
-        });
-
-        // Event listener for the forecast dropdown
-        let selectedForecastId;
-        forecastListbox.addEventListener("change", (event) => {
-          selectedForecastId = event.target.value;
-
-          // Get the selected gux-option's innerHTML
-          var selectedOption = Array.from(
-            forecastListbox.querySelectorAll("gux-option")
-          ).find((option) => option.value === selectedForecastId);
-          var selectedForecastName = selectedOption
-            ? selectedOption.innerHTML
-            : "";
-
-          // Remove <!----> if found in selectedForecastName
-          selectedForecastName = selectedForecastName.replace(/<!---->/g, "");
-
-          console.log(`[LTF] Selected forecast: ${selectedForecastId}`);
-        });
-
-        // Event listener for generate button
-        document
-          .getElementById("generateBtn")
-          .addEventListener(
-            "click",
-            generate(selectedBuId, selectedForecastId)
-          );
+        // Functions start here
 
         // Function to initialize the widget
         async function init() {
@@ -214,6 +167,53 @@
 
         // main
         await init();
+
+        // Event listeners
+        // Event listener for bu-listbox
+        let selectedBuId;
+        let selectedBuName;
+        buListbox.addEventListener("change", (event) => {
+          selectedBuId = event.target.value;
+
+          // Get the selected gux-option's innerHTML
+          var selectedOption = Array.from(
+            buListbox.querySelectorAll("gux-option")
+          ).find((option) => option.value === selectedBuId);
+          selectedBuName = selectedOption ? selectedOption.innerHTML : "";
+
+          // Remove <!----> if found in selectedBuName
+          selectedBuName = selectedBuName.replace(/<!---->/g, "");
+
+          console.log(
+            `[LTF] Selected business unit: ${selectedBuId} (${selectedBuName})`
+          );
+        });
+
+        // Event listener for the forecast dropdown
+        let selectedForecastId;
+        forecastListbox.addEventListener("change", (event) => {
+          selectedForecastId = event.target.value;
+
+          // Get the selected gux-option's innerHTML
+          var selectedOption = Array.from(
+            forecastListbox.querySelectorAll("gux-option")
+          ).find((option) => option.value === selectedForecastId);
+          var selectedForecastName = selectedOption
+            ? selectedOption.innerHTML
+            : "";
+
+          // Remove <!----> if found in selectedForecastName
+          selectedForecastName = selectedForecastName.replace(/<!---->/g, "");
+
+          console.log(`[LTF] Selected forecast: ${selectedForecastId}`);
+        });
+
+        // Event listener for generate button
+        document
+          .getElementById("generateBtn")
+          .addEventListener("click", () =>
+            generate(selectedBuId, selectedForecastId)
+          );
       });
     </script>
     <script type="module" src="/raa-ltf/src/erlangXL97.js"></script>
