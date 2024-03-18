@@ -79,25 +79,37 @@
     <script>
       // wait for dom to load
       document.addEventListener("DOMContentLoaded", async function () {
-        var platformClient = window.require("platformClient");
+        // Check testing mode by protocol. If https then production, else testing
+        const isTesting = window.location.protocol !== "https:";
 
-        var clientId = "4c89c35c-d1ec-4fad-91f5-240d37b4d546";
+        if (isTesting) {
+          console.log("[LTF] Testing mode");
+        } else {
+          console.log("[LTF] Production mode");
 
-        window.client = platformClient.ApiClient.instance;
-        client.setEnvironment("usw2.pure.cloud");
-        client.setPersistSettings(true, "ltf-widget");
+          var platformClient = window.require("platformClient");
 
-        try {
-          await client.loginImplicitGrant(
-            clientId,
-            "https://apmaries.github.io/raa-ltf/widget.html"
-          );
-        } catch (e) {
-          console.error("[LTF] Error logging in", e);
+          var clientId = "4c89c35c-d1ec-4fad-91f5-240d37b4d546";
+
+          window.client = platformClient.ApiClient.instance;
+          client.setEnvironment("usw2.pure.cloud");
+          client.setPersistSettings(true, "ltf-widget");
+
+          try {
+            await client.loginImplicitGrant(
+              clientId,
+              "https://apmaries.github.io/raa-ltf/widget.html"
+            );
+          } catch (e) {
+            console.error("[LTF] Error logging in", e);
+          }
         }
       });
     </script>
     <script>
+      // Check testing mode by protocol. If https then production, else testing
+      const isTesting = window.location.protocol !== "https:";
+
       window.onerror = function (message, source, lineno, colno, error) {
         console.error(
           `[LTF] An error occurred: ${message}\nAt: ${source}:${lineno}:${colno}`
