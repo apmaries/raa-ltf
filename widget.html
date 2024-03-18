@@ -80,11 +80,19 @@
             "https://apmaries.github.io/raa-ltf/widget.html"
           );
         } catch (e) {
-          console.error("LTF: Error logging in", e);
+          console.error("[LTF] Error logging in", e);
         }
       });
     </script>
     <script>
+      window.onerror = function (message, source, lineno, colno, error) {
+        console.error(
+          `[LTF] An error occurred: ${message}\nAt: ${source}:${lineno}:${colno}`
+        );
+        console.error(error);
+        return true; // Prevents the firing of the default event handler.
+      };
+
       document.addEventListener("DOMContentLoaded", async function () {
         var platformClient = window.require("platformClient");
         const client = window.client;
@@ -93,10 +101,10 @@
         const buListbox = document.getElementById("business-unit-listbox");
         const forecastListbox = document.getElementById("forecast-listbox");
 
+        // Event listener for generate button
         document
           .getElementById("generateBtn")
           .addEventListener("click", generate);
-        console.log("LTF: Client = ", client);
 
         // Event listener for bu-listbox
         let selectedBuId;
@@ -114,31 +122,31 @@
           selectedBuName = selectedBuName.replace(/<!---->/g, "");
 
           console.log(
-            `LTF: Selected business unit: ${selectedBuName} (${selectedBuId})`
+            `[LTF] Selected business unit: ${selectedBuName} (${selectedBuId})`
           );
         });
 
+        // Function to initialize the widget
         async function init() {
-          // function to get business units
+          // Get business units to populate dropdown
           async function getBusinessUnits() {
-            // Get business units to populate dropdown
             return wfmApi
               .getWorkforcemanagementBusinessunits()
               .then((data) => {
-                console.log("LTF: Business Units = ", data);
+                console.log("[LTF] Business Units = ", data);
                 return data.entities || [];
               })
               .catch((err) => {
-                console.error("LTF: Error getting business units", err);
+                console.error("[LTF] Error getting business units", err);
               });
           }
 
-          // Get business units
+          // Get business unit entities
           const businessUnits = await getBusinessUnits();
 
           // If no business units found, display message in dropdown
           if (businessUnits.length === 0) {
-            console.log("LTF: No business units found");
+            console.log("[LTF] No business units found");
             const option = document.createElement("gux-option");
             option.innerHTML = "No business units found";
             dropdown.appendChild(option);
@@ -160,9 +168,8 @@
           });
         }
 
-        async function getForecasts() {
-          // Get long term forecast objects to populate dropdown
-        }
+        // Get long term forecast objects to populate dropdown
+        async function getForecasts(selectedBuId) {}
 
         async function generate() {
           // Function to get forecast data for selected forecast
@@ -174,7 +181,7 @@
           async function loadForecastData() {
             // Load forecast data
             const response = await fetch("/raa-ltf/.test/forecastData.json");
-            console.log("LTF: Test data loaded");
+            console.log("[LTF] Test data loaded");
             return response.json();
           }
         }
