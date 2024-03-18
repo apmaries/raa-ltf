@@ -207,6 +207,9 @@
             `[LTF] Selected business unit: ${selectedBuId} (${selectedBuName})`
           );
 
+          // Remove existing forecast options
+          forecastListbox.innerHTML = "";
+
           // Get long term forecast objects to populate dropdown
           // Forecast entities are filtered to only include forecasts with weekCount > 6
           const forecasts = await getForecasts(selectedBuId);
