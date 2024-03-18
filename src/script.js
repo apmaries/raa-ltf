@@ -1,7 +1,7 @@
 const buListbox = document.getElementById("business-unit-listbox");
 
 document.getElementById("generateBtn").addEventListener("click", generate);
-console.log(client);
+console.log("LTF: Client = ", client);
 
 // Event listener for bu-listbox
 let selectedBuId;
