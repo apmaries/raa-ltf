@@ -122,8 +122,27 @@
           selectedBuName = selectedBuName.replace(/<!---->/g, "");
 
           console.log(
-            `[LTF] Selected business unit: ${selectedBuName} (${selectedBuId})`
+            `[LTF] Selected business unit: ${selectedBuId} (${selectedBuName})`
           );
+        });
+
+        // Event listener for the forecast dropdown
+        let selectedForecastId;
+        forecastListbox.addEventListener("change", (event) => {
+          selectedForecastId = event.target.value;
+
+          // Get the selected gux-option's innerHTML
+          var selectedOption = Array.from(
+            forecastListbox.querySelectorAll("gux-option")
+          ).find((option) => option.value === selectedForecastId);
+          var selectedForecastName = selectedOption
+            ? selectedOption.innerHTML
+            : "";
+
+          // Remove <!----> if found in selectedForecastName
+          selectedForecastName = selectedForecastName.replace(/<!---->/g, "");
+
+          console.log(`[LTF] Selected forecast: ${selectedForecastId}`);
         });
 
         // Function to initialize the widget
