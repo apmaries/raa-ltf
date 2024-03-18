@@ -101,21 +101,40 @@
 
         // Functions start here
 
+        // Function to get business units
+        async function getBusinessUnits() {
+          try {
+            const data = await wfmApi.getWorkforcemanagementBusinessunits();
+            console.log("[LTF] Business Units = ", data);
+            return data.entities || [];
+          } catch (err) {
+            console.error("[LTF] Error getting business units", err);
+            return [];
+          }
+        }
+
+        // Function to get forecasts
+        async function getForecasts(selectedBuId) {
+          try {
+            const data =
+              await wfmApi.getWorkforcemanagementBusinessunitWeekShorttermforecasts(
+                selectedBuId,
+                "recent"
+              );
+            console.log("[LTF] Forecasts = ", data);
+
+            // filter results to only include forecasts with weekCount > 6
+            data.entities = data.entities.filter((item) => item.weekCount > 6);
+
+            return data.entities || [];
+          } catch (err) {
+            console.error("[LTF] Error getting forecasts", err);
+            return [];
+          }
+        }
+
         // Function to initialize the widget
         async function init() {
-          // Get business units to populate dropdown
-          async function getBusinessUnits() {
-            return wfmApi
-              .getWorkforcemanagementBusinessunits()
-              .then((data) => {
-                console.log("[LTF] Business Units = ", data);
-                return data.entities || [];
-              })
-              .catch((err) => {
-                console.error("[LTF] Error getting business units", err);
-              });
-          }
-
           // Get business unit entities
           const businessUnits = await getBusinessUnits();
 
@@ -134,18 +153,18 @@
           );
 
           // Populate business unit dropdown
+          const fragment = document.createDocumentFragment();
           businessUnits.forEach((item) => {
             const option = document.createElement("gux-option");
             option.value = item.id;
             option.name = item.name;
             option.innerHTML = item.name;
-            buListbox.appendChild(option);
+            fragment.appendChild(option);
           });
+          buListbox.appendChild(fragment);
         }
 
-        // Get long term forecast objects to populate dropdown
-        async function getForecasts(selectedBuId) {}
-
+        // Function to generate forecast output
         async function generate() {
           // Function to get forecast data for selected forecast
           console.log("[LTF] Generating forecast data");
@@ -165,14 +184,16 @@
           }
         }
 
-        // main
+        // Functions end here
+
+        // init on page load
         await init();
 
         // Event listeners
         // Event listener for bu-listbox
         let selectedBuId;
         let selectedBuName;
-        buListbox.addEventListener("change", (event) => {
+        buListbox.addEventListener("change", async (event) => {
           selectedBuId = event.target.value;
 
           // Get the selected gux-option's innerHTML
@@ -187,6 +208,37 @@
           console.log(
             `[LTF] Selected business unit: ${selectedBuId} (${selectedBuName})`
           );
+
+          // Get long term forecast objects to populate dropdown
+          // Forecast entities are filtered to only include forecasts with weekCount > 6
+          const forecasts = await getForecasts(selectedBuId);
+
+          // If no forecasts found, display message in dropdown
+          if (forecasts.length === 0) {
+            console.log("[LTF] No recent forecasts >6 weeks long found");
+            const option = document.createElement("gux-option");
+            option.innerHTML = "No forecasts found";
+            forecastListbox.appendChild(option);
+            return;
+          }
+
+          // sort data by weekDate (not case sensitive)
+          forecasts.sort((a, b) =>
+            a.weekDate.localeCompare(b.weekDate, undefined, {
+              sensitivity: "base",
+            })
+          );
+
+          // Populate forecasts dropdown
+          const fragment = document.createDocumentFragment();
+          forecasts.forEach((item) => {
+            const option = document.createElement("gux-option");
+            option.value = item.id;
+            option.description = item.description;
+            option.innerHTML = `${item.weekDate} (${item.description})`;
+            fragment.appendChild(option);
+          });
+          forecastListbox.appendChild(fragment);
         });
 
         // Event listener for the forecast dropdown
