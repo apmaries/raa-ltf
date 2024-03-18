@@ -42,6 +42,23 @@
 
       <div class="dropdown">
         <label for="forecast">Forecast:</label>
+
+        <gux-table id="forecasts-table">
+          <table slot="data">
+            <thead>
+              <tr>
+                <th data-column-name="radio" data-cell-action>Select</th>
+                <th data-column-name="week-date">Week Date</th>
+                <th data-column-name="week-count">Week Count</th>
+                <th data-column-name="week-description">Description</th>
+              </tr>
+            </thead>
+            <tbody id="forecasts-table-body">
+              <!-- Forecast objects will be added dynamically -->
+            </tbody>
+          </table>
+        </gux-table>
+
         <gux-dropdown
           id="forecast"
           filter-type="starts-with"
