@@ -87,8 +87,8 @@
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
         var platformClient = window.require("platformClient");
-        const wfmApi = new platformClient.WorkforceManagementApi();
         const client = window.client;
+        const wfmApi = new platformClient.WorkforceManagementApi();
 
         const buListbox = document.getElementById("business-unit-listbox");
         const forecastListbox = document.getElementById("forecast-listbox");
@@ -126,20 +126,31 @@
               .getWorkforcemanagementBusinessunits()
               .then((data) => {
                 console.log("LTF: Business Units = ", data);
-                return data;
+                return data.entities || [];
               })
               .catch((err) => {
                 console.error("LTF: Error getting business units", err);
               });
           }
 
+          // Get business units
           const businessUnits = await getBusinessUnits();
+
+          // If no business units found, display message in dropdown
+          if (businessUnits.length === 0) {
+            console.log("LTF: No business units found");
+            const option = document.createElement("gux-option");
+            option.innerHTML = "No business units found";
+            dropdown.appendChild(option);
+            return;
+          }
 
           // sort data by name (not case sensitive)
           businessUnits.sort((a, b) =>
             a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
           );
 
+          // Populate business unit dropdown
           businessUnits.array.forEach((item) => {
             const option = document.createElement("gux-option");
             option.value = item.id;
