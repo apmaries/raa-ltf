@@ -101,11 +101,6 @@
         const buListbox = document.getElementById("business-unit-listbox");
         const forecastListbox = document.getElementById("forecast-listbox");
 
-        // Event listener for generate button
-        document
-          .getElementById("generateBtn")
-          .addEventListener("click", generate);
-
         // Event listener for bu-listbox
         let selectedBuId;
         let selectedBuName;
@@ -144,6 +139,14 @@
 
           console.log(`[LTF] Selected forecast: ${selectedForecastId}`);
         });
+
+        // Event listener for generate button
+        document
+          .getElementById("generateBtn")
+          .addEventListener(
+            "click",
+            generate(selectedBuId, selectedForecastId)
+          );
 
         // Function to initialize the widget
         async function init() {
@@ -192,6 +195,10 @@
 
         async function generate() {
           // Function to get forecast data for selected forecast
+          console.log("[LTF] Generating forecast data");
+          console.log("[LTF] Selected business unit: ", selectedBuId);
+          console.log("[LTF] Selected forecast: ", selectedForecastId);
+
           async function getForecastData() {
             // Get forecast data
           }
