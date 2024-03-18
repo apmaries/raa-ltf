@@ -128,10 +128,16 @@
 
         // Functions start here
 
-        // Function to get business units
+        // Function to get Business Units
         async function getBusinessUnits() {
           try {
-            const data = await wfmApi.getWorkforcemanagementBusinessunits();
+            let data;
+            if (isTesting) {
+              const response = await fetch(".test/businessUnits.json");
+              data = await response.json();
+            } else {
+              data = await wfmApi.getWorkforcemanagementBusinessunits();
+            }
             console.log("[LTF] Business Units = ", data);
             return data.entities || [];
           } catch (err) {
@@ -140,14 +146,20 @@
           }
         }
 
-        // Function to get forecasts
+        // Function to get Forecasts
         async function getForecasts(selectedBuId) {
           try {
-            const data =
-              await wfmApi.getWorkforcemanagementBusinessunitWeekShorttermforecasts(
-                selectedBuId,
-                "recent"
-              );
+            let data;
+            if (isTesting) {
+              const response = await fetch(".test/forecasts.json");
+              data = await response.json();
+            } else {
+              data =
+                await wfmApi.getWorkforcemanagementBusinessunitWeekShorttermforecasts(
+                  selectedBuId,
+                  "recent"
+                );
+            }
             console.log("[LTF] Forecasts = ", data);
 
             // filter results to only include forecasts with weekCount > 6
