@@ -86,8 +86,10 @@
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
+        var platformClient = window.require("platformClient");
+        const wfmApi = new platformClient.WorkforceManagementApi();
         const client = window.client;
-        const wfmApi = client.WorkforceManagementApi();
+
         const buListbox = document.getElementById("business-unit-listbox");
         const forecastListbox = document.getElementById("forecast-listbox");
 
