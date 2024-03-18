@@ -159,7 +159,7 @@
           );
 
           // Populate business unit dropdown
-          businessUnits.array.forEach((item) => {
+          businessUnits.forEach((item) => {
             const option = document.createElement("gux-option");
             option.value = item.id;
             option.name = item.name;
