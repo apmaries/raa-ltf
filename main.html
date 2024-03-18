@@ -43,7 +43,7 @@
       <div class="dropdown">
         <label for="forecast">Forecast:</label>
 
-        <gux-table id="forecasts-table">
+        <gux-table-beta id="forecasts-table" compact>
           <table slot="data">
             <thead>
               <tr>
@@ -55,20 +55,25 @@
             </thead>
             <tbody id="forecasts-table-body">
               <!-- Forecast objects will be added dynamically -->
+
+              <tr>
+                <td colspan="4">Please select a Business Unit above</td>
+              </tr>
             </tbody>
           </table>
-        </gux-table>
+        </gux-table-beta>
 
-        <gux-dropdown
+        <!-- 
+          <gux-dropdown
           id="forecast"
           filter-type="starts-with"
           placeholder="Select a long term forecast"
         >
           <gux-listbox id="forecast-listbox" aria-label="Forecast Selection">
-            <!-- Forecast objects will be added dynamically -->
+            
           </gux-listbox>
         </gux-dropdown>
-      </div>
+      --></div>
 
       <gux-button id="generateBtn" accent="primary">Generate</gux-button>
     </fieldset>
@@ -124,7 +129,8 @@
         const wfmApi = new platformClient.WorkforceManagementApi();
 
         const buListbox = document.getElementById("business-unit-listbox");
-        const forecastListbox = document.getElementById("forecast-listbox");
+        //const forecastListbox = document.getElementById("forecast-listbox");
+        const tableBody = document.getElementById("forecasts-table-body");
 
         // Functions start here
 
@@ -249,18 +255,19 @@
           );
 
           // Remove existing forecast options
-          forecastListbox.innerHTML = "";
+          //forecastListbox.innerHTML = "";
+          tableBody.innerHTML = "";
 
           // Get long term forecast objects to populate dropdown
           // Forecast entities are filtered to only include forecasts with weekCount > 6
           const forecasts = await getForecasts(selectedBuId);
 
-          // If no forecasts found, display message in dropdown
+          // If no forecasts found, add table row with message
           if (forecasts.length === 0) {
-            console.log("[LTF] No recent forecasts >6 weeks long found");
-            const option = document.createElement("gux-option");
-            option.innerHTML = "No forecasts found";
-            forecastListbox.appendChild(option);
+            console.log("[LTF] No forecasts found");
+            const row = document.createElement("tr");
+            row.innerHTML = `<td colspan="4">No forecasts found</td>`;
+            tableBody.appendChild(row);
             return;
           }
 
@@ -271,43 +278,47 @@
             })
           );
 
-          // Populate forecasts dropdown
+          // Populate forecasts table
+
           const fragment = document.createDocumentFragment();
           forecasts.forEach((item) => {
-            const option = document.createElement("gux-option");
-            option.value = item.id;
-            option.description = item.description;
-            option.innerHTML = `${item.weekDate} (${item.description})`;
-            fragment.appendChild(option);
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="radio" name="forecast" value="${item.id}"></td>
+                <td>${item.weekDate}</td>
+                <td>${item.weekCount}</td>
+                <td>${item.description}</td>
+              `;
+            fragment.appendChild(row);
           });
-          forecastListbox.appendChild(fragment);
+          tableBody.appendChild(fragment);
+
+          // Event listener for the forecast dropdown
+          let selectedForecastId;
+          forecastListbox.addEventListener("change", (event) => {
+            selectedForecastId = event.target.value;
+
+            // Get the selected gux-option's innerHTML
+            var selectedOption = Array.from(
+              forecastListbox.querySelectorAll("gux-option")
+            ).find((option) => option.value === selectedForecastId);
+            var selectedForecastName = selectedOption
+              ? selectedOption.innerHTML
+              : "";
+
+            // Remove <!----> if found in selectedForecastName
+            selectedForecastName = selectedForecastName.replace(/<!---->/g, "");
+
+            console.log(`[LTF] Selected forecast: ${selectedForecastId}`);
+          });
+
+          // Event listener for generate button
+          document
+            .getElementById("generateBtn")
+            .addEventListener("click", () =>
+              generate(selectedBuId, selectedForecastId)
+            );
         });
-
-        // Event listener for the forecast dropdown
-        let selectedForecastId;
-        forecastListbox.addEventListener("change", (event) => {
-          selectedForecastId = event.target.value;
-
-          // Get the selected gux-option's innerHTML
-          var selectedOption = Array.from(
-            forecastListbox.querySelectorAll("gux-option")
-          ).find((option) => option.value === selectedForecastId);
-          var selectedForecastName = selectedOption
-            ? selectedOption.innerHTML
-            : "";
-
-          // Remove <!----> if found in selectedForecastName
-          selectedForecastName = selectedForecastName.replace(/<!---->/g, "");
-
-          console.log(`[LTF] Selected forecast: ${selectedForecastId}`);
-        });
-
-        // Event listener for generate button
-        document
-          .getElementById("generateBtn")
-          .addEventListener("click", () =>
-            generate(selectedBuId, selectedForecastId)
-          );
       });
     </script>
     <script type="module" src="/raa-ltf/src/erlangXL97.js"></script>
