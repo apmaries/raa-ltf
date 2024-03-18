@@ -65,17 +65,17 @@
 
     <script>
       // wait for dom to load
-      document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", async function () {
         var platformClient = window.require("platformClient");
 
         var clientId = "4c89c35c-d1ec-4fad-91f5-240d37b4d546";
 
-        var client = platformClient.ApiClient.instance;
+        window.client = platformClient.ApiClient.instance;
         client.setEnvironment("usw2.pure.cloud");
         client.setPersistSettings(true, "ltf-widget");
 
         try {
-          client.loginImplicitGrant(
+          await client.loginImplicitGrant(
             clientId,
             "https://apmaries.github.io/raa-ltf/widget.html"
           );
@@ -85,73 +85,78 @@
       });
     </script>
     <script>
-      const buListbox = document.getElementById("business-unit-listbox");
+      document.addEventListener("DOMContentLoaded", async function () {
+        const client = window.client;
+        const buListbox = document.getElementById("business-unit-listbox");
+        const forecastListbox = document.getElementById("forecast-listbox");
 
-      document
-        .getElementById("generateBtn")
-        .addEventListener("click", generate);
-      console.log("LTF: Client = ", client);
+        document
+          .getElementById("generateBtn")
+          .addEventListener("click", generate);
+        console.log("LTF: Client = ", client);
 
-      // Event listener for bu-listbox
-      let selectedBuId;
-      let selectedBuName;
-      buListbox.addEventListener("change", (event) => {
-        selectedBuId = event.target.value;
+        // Event listener for bu-listbox
+        let selectedBuId;
+        let selectedBuName;
+        buListbox.addEventListener("change", (event) => {
+          selectedBuId = event.target.value;
 
-        // Get the selected gux-option's innerHTML
-        var selectedOption = Array.from(
-          buListbox.querySelectorAll("gux-option")
-        ).find((option) => option.value === selectedBuId);
-        selectedBuName = selectedOption ? selectedOption.innerHTML : "";
+          // Get the selected gux-option's innerHTML
+          var selectedOption = Array.from(
+            buListbox.querySelectorAll("gux-option")
+          ).find((option) => option.value === selectedBuId);
+          selectedBuName = selectedOption ? selectedOption.innerHTML : "";
 
-        // Remove <!----> if found in selectedBuName
-        selectedBuName = selectedBuName.replace(/<!---->/g, "");
+          // Remove <!----> if found in selectedBuName
+          selectedBuName = selectedBuName.replace(/<!---->/g, "");
 
-        console.log(
-          `LTF: Selected business unit: ${selectedBuName} (${selectedBuId})`
-        );
-      });
+          console.log(
+            `LTF: Selected business unit: ${selectedBuName} (${selectedBuId})`
+          );
+        });
 
-      function init() {
-        // function to get business units
-        function getBusinessUnits() {
-          // Add your getBusinessUnits logic here
-          client
-            .getWorkforcemanagementBusinessunits()
-            .then((data) => {
-              console.log("LTF: Business Units = ", data);
-            })
-            .catch((err) => {
-              console.error("LTF: Error getting business units", err);
-            });
+        async function init() {
+          // function to get business units
+          async function getBusinessUnits() {
+            // Get business units to populate dropdown
+            return client
+              .getWorkforcemanagementBusinessunits()
+              .then((data) => {
+                console.log("LTF: Business Units = ", data);
+                return data;
+              })
+              .catch((err) => {
+                console.error("LTF: Error getting business units", err);
+              });
+          }
+
+          const businessUnits = await getBusinessUnits();
+
+          // sort data by name (not case sensitive)
+          businessUnits.sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+          );
+
+          businessUnits.array.forEach((item) => {
+            const option = document.createElement("gux-option");
+            option.value = item.id;
+            option.name = item.name;
+            option.innerHTML = item.name;
+            dropdown.appendChild(option);
+          });
         }
 
-        const businessUnits = getBusinessUnits();
+        async function getForecasts() {
+          // Get long term forecast objects to populate dropdown
+        }
 
-        // sort data by name (not case sensitive)
-        businessUnits.sort((a, b) =>
-          a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
-        );
+        function generate() {
+          // Add your generate logic here
+        }
 
-        businessUnits.array.forEach((item) => {
-          const option = document.createElement("gux-option");
-          option.value = item.id;
-          option.name = item.name;
-          option.innerHTML = item.name;
-          dropdown.appendChild(option);
-        });
-      }
-
-      async function getForecasts() {
-        // Add your getForecasts logic here
-      }
-
-      function generate() {
-        // Add your generate logic here
-      }
-
-      // main
-      init();
+        // main
+        await init();
+      });
     </script>
     <script type="module" src="/raa-ltf/src/erlangXL97.js"></script>
   </body>
