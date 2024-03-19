@@ -15,8 +15,36 @@
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
 
     <style>
-      .dropdown {
+      body {
+        background-color: antiquewhite;
+      }
+
+      gux-tab-panel > div {
+        width: 1500px;
+        padding: 20px;
+      }
+
+      gux-tab-panel > div > div {
         margin-bottom: 20px;
+      }
+
+      fieldset {
+        background-color: white;
+        width: 80%;
+        margin: 0 auto;
+      }
+
+      #forecasts-table td {
+        text-align: left;
+      }
+      #forecasts-table th,
+      #forecasts-table td {
+        text-align: left;
+      }
+
+      .buttons-div {
+        display: flex;
+        justify-content: space-between;
       }
     </style>
   </head>
@@ -24,58 +52,164 @@
     <fieldset>
       <h1>RAA Long Term Forecast</h1>
 
-      <div class="dropdown">
-        <label for="businessUnit">Business Unit:</label>
-        <gux-dropdown
-          id="businessUnit"
-          filter-type="starts-with"
-          placeholder="Select a Business Unit"
-        >
-          <gux-listbox
-            id="business-unit-listbox"
-            aria-label="Business Unit Selection"
-          >
-            <!-- BU objects will be added dynamically -->
-          </gux-listbox>
-        </gux-dropdown>
-      </div>
+      <gux-tabs orientation="vertical" style="display: block">
+        <gux-tab-list id="tab-list" slot="tab-list" active-tab="2">
+          <gux-tab id="inputs-tab" tab-id="1">Inputs</gux-tab>
+          <gux-tab id="outputs-tab" tab-id="2">Outputs</gux-tab>
+        </gux-tab-list>
+        <gux-tab-panel id="inputs-tab-panel" tab-id="1" style="overflow: auto">
+          <div class="dropdown-div">
+            <label for="business-unit"><h2>Business Unit:</h2></label>
+            <gux-dropdown
+              id="business-unit"
+              filter-type="starts-with"
+              placeholder="Select a Business Unit"
+            >
+              <gux-listbox
+                id="business-unit-listbox"
+                aria-label="Business Unit Selection"
+              >
+                <!-- BU objects will be added dynamically -->
+              </gux-listbox>
+            </gux-dropdown>
+          </div>
 
-      <div class="dropdown">
-        <label for="forecast">Forecast:</label>
+          <div class="table-div">
+            <label for="forecast"><h2>Forecast:</h2></label>
 
-        <gux-table-beta id="forecasts-table" compact>
-          <table slot="data">
-            <thead>
-              <tr>
-                <th data-column-name="radio" data-cell-action>Select</th>
-                <th data-column-name="week-date">Week Date</th>
-                <th data-column-name="week-count">Week Count</th>
-                <th data-column-name="week-description">Description</th>
-              </tr>
-            </thead>
-            <tbody id="forecasts-table-body">
-              <!-- Forecast objects will be added dynamically -->
+            <gux-table-beta id="forecasts-table" object-table>
+              <table slot="data">
+                <thead>
+                  <tr>
+                    <th data-column-name="radio" data-cell-action>Select</th>
+                    <th data-column-name="week-date">Week Date</th>
+                    <th data-column-name="week-count">Week Count</th>
+                    <th data-column-name="week-description">Description</th>
+                  </tr>
+                </thead>
+                <tbody id="forecasts-table-body">
+                  <!-- Forecast objects will be added dynamically -->
+                </tbody>
+              </table>
+            </gux-table-beta>
+          </div>
 
-              <tr>
-                <td colspan="4">Please select a Business Unit above</td>
-              </tr>
-            </tbody>
-          </table>
-        </gux-table-beta>
+          <div class="buttons-div">
+            <gux-button id="generate-button" accent="primary"
+              >Generate</gux-button
+            >
+          </div>
+        </gux-tab-panel>
+        <gux-tab-panel id="outputs-tab-panel" tab-id="2" style="overflow: auto">
+          <div class="dropdown-div">
+            <label for="planning-group"><h2>Planning Group:</h2></label>
+            <gux-dropdown
+              id="planning-group"
+              filter-type="starts-with"
+              placeholder="Select a Planning Group"
+            >
+              <gux-listbox
+                id="business-unit-listbox"
+                aria-label="Planning Group Selection"
+              >
+                <!-- PG objects will be added dynamically -->
+              </gux-listbox>
+            </gux-dropdown>
+          </div>
+          <div class="table-div">
+            <label for="forecast"><h2>Outputs:</h2></label>
 
-        <!-- 
-          <gux-dropdown
-          id="forecast"
-          filter-type="starts-with"
-          placeholder="Select a long term forecast"
-        >
-          <gux-listbox id="forecast-listbox" aria-label="Forecast Selection">
-            
-          </gux-listbox>
-        </gux-dropdown>
-      --></div>
+            <gux-table-beta id="outputs-table" object-table>
+              <table slot="data">
+                <thead>
+                  <tr>
+                    <!-- Month of the forecast -->
+                    <th data-column-name="cal-month" id="monthColumn">Month</th>
 
-      <gux-button id="generateBtn" accent="primary">Generate</gux-button>
+                    <!-- Forecasted number of calls offered -->
+                    <th data-column-name="offered" id="forecastOfferedColumn">
+                      Forecast Offered
+                    </th>
+
+                    <!-- Forecasted Average Handling Time -->
+                    <th data-column-name="aht" id="forecastAhtColumn">
+                      Forecast AHT
+                    </th>
+
+                    <!-- Service Level percentage -->
+                    <th data-column-name="sl-threshold" id="slPercentColumn">
+                      SL %
+                    </th>
+
+                    <!-- Service Level time -->
+                    <th data-column-name="sl-time" id="slTimeColumn">
+                      SL time
+                    </th>
+
+                    <!-- Average Speed of Answer -->
+                    <th data-column-name="asa" id="asaColumn">ASA</th>
+
+                    <!-- Occupancy percentage -->
+                    <th data-column-name="occupancy" id="occupancyColumn">
+                      OCC %
+                    </th>
+
+                    <!-- Base Full-Time Equivalent -->
+                    <th data-column-name="base-fte" id="baseFteColumn">
+                      Base FTE
+                    </th>
+
+                    <!-- Mean Square Error of Forecast -->
+                    <th data-column-name="mseff" id="mseffColumn">MSEFF</th>
+
+                    <!-- Shrinkage percentage -->
+                    <th data-column-name="shrinkage" id="shrinkageColumn">
+                      Shrinkage
+                    </th>
+
+                    <!-- Required Full-Time Equivalent -->
+                    <th data-column-name="req-fte" id="reqFteColumn">
+                      Req FTE
+                    </th>
+
+                    <!-- Actual Full-Time Equivalent -->
+                    <th data-column-name="act-fte" id="actFteColumn">
+                      Act FTE
+                    </th>
+
+                    <!-- Attrition percentage -->
+                    <th data-column-name="attr-per" id="attritionPercentColumn">
+                      Attrition %
+                    </th>
+
+                    <!-- Absolute Attrition -->
+                    <th data-column-name="attr-per" id="absAttritionColumn">
+                      ABS Attrition
+                    </th>
+
+                    <!-- New Hire Full-Time Equivalent -->
+                    <th data-column-name="new-fte" id="newHireFteColumn">
+                      New Hire FTE
+                    </th>
+
+                    <!-- Variance in Required Full-Time Equivalent -->
+                    <th data-column-name="variance" id="fteReqPlusMinusColumn">
+                      FTE Req +/-
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="outputs-table-body">
+                  <!-- Forecast objects will be added dynamically -->
+                </tbody>
+              </table>
+            </gux-table-beta>
+          </div>
+          <div class="buttons-div">
+            <gux-button id="back-button" accent="secondary">Back</gux-button>
+            <gux-button id="export-button" accent="primary">Export</gux-button>
+          </div>
+        </gux-tab-panel>
+      </gux-tabs>
     </fieldset>
 
     <!-- Load the PureCloud platform client library -->
@@ -211,10 +345,27 @@
 
         // Function to generate forecast output
         async function generate() {
-          // Function to get forecast data for selected forecast
+          // Get forecast table selected object by forecast-radio name
+          const selectedForecastRadio = document.querySelector(
+            "input[name='forecast-radio']:checked"
+          );
+
           console.log("[LTF] Generating forecast data");
           console.log("[LTF] Selected business unit: ", selectedBuId);
           console.log("[LTF] Selected forecast: ", selectedForecastId);
+
+          // Remove gux-disabled attribute from Outputs tab
+          // TODO: This is not working... not sure why
+          /*var tabPanel = document.querySelector('gux-tab-panel[tab-id="2"]');
+          if (tabPanel) {
+            console.log(
+              "[LTF] Removing gux-disabled attribute from Outputs tab"
+            );
+            tabPanel.removeAttribute("gux-disabled");
+          }*/
+
+          // Switch to tab 2
+          document.querySelector("#outputs-tab").click();
 
           async function getForecastData() {
             // Get forecast data
@@ -255,7 +406,6 @@
           );
 
           // Remove existing forecast options
-          //forecastListbox.innerHTML = "";
           tableBody.innerHTML = "";
 
           // Get long term forecast objects to populate dropdown
@@ -284,7 +434,7 @@
           forecasts.forEach((item) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td><input type="radio" name="forecast" value="${item.id}"></td>
+                <td><input type="radio" name="forecast-radio" value="${item.id}"></td>
                 <td>${item.weekDate}</td>
                 <td>${item.weekCount}</td>
                 <td>${item.description}</td>
@@ -293,31 +443,41 @@
           });
           tableBody.appendChild(fragment);
 
-          // Event listener for the forecast dropdown
-          let selectedForecastId;
-          forecastListbox.addEventListener("change", (event) => {
-            selectedForecastId = event.target.value;
-
-            // Get the selected gux-option's innerHTML
-            var selectedOption = Array.from(
-              forecastListbox.querySelectorAll("gux-option")
-            ).find((option) => option.value === selectedForecastId);
-            var selectedForecastName = selectedOption
-              ? selectedOption.innerHTML
-              : "";
-
-            // Remove <!----> if found in selectedForecastName
-            selectedForecastName = selectedForecastName.replace(/<!---->/g, "");
-
-            console.log(`[LTF] Selected forecast: ${selectedForecastId}`);
+          // Event listener for the forecast-radios
+          const forecastRadios = document.querySelectorAll(
+            "input[name='forecast-radio']"
+          );
+          forecastRadios.forEach((radio) => {
+            radio.addEventListener("change", (event) => {
+              selectedForecastId = event.target.value;
+              console.log(
+                `[LTF] Selected forecast: ${selectedForecastId} (${selectedBuName})`
+              );
+            });
           });
 
           // Event listener for generate button
           document
-            .getElementById("generateBtn")
-            .addEventListener("click", () =>
-              generate(selectedBuId, selectedForecastId)
-            );
+            .getElementById("generate-button")
+            .addEventListener("click", () => {
+              // If no forecast is selected, display message
+              if (!selectedBuId || !selectedForecastId) {
+                console.log("[LTF] No forecast selected");
+                alert("Please select a forecast");
+                return;
+              }
+
+              generate(selectedBuId, selectedForecastId);
+            });
+
+          // Event listener for back button
+          document
+            .getElementById("back-button")
+            .addEventListener("click", () => {
+              // Switch to tab 1
+              console.log("[LTF] Switching to tab 1");
+              document.querySelector("#inputs-tab").click();
+            });
         });
       });
     </script>
