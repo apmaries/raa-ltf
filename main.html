@@ -285,12 +285,12 @@
 
           window.client = platformClient.ApiClient.instance;
           client.setEnvironment("usw2.pure.cloud");
-          client.setPersistSettings(true, "ltf-widget");
+          client.setPersistSettings(true, "raa-ltf");
 
           try {
             await client.loginImplicitGrant(
               clientId,
-              "https://apmaries.github.io/raa-ltf/widget.html"
+              "https://apmaries.github.io/raa-ltf/main.html"
             );
           } catch (e) {
             console.error("[LTF] Error logging in", e);
