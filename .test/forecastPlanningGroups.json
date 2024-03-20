@@ -19,8 +19,8 @@
       ],
       "serviceGoalTemplate": {
         "serviceLevel": {
-          "percent": 80,
-          "seconds": 20
+          "percent": 70,
+          "seconds": 120
         }
       }
     },
@@ -44,8 +44,8 @@
       ],
       "serviceGoalTemplate": {
         "serviceLevel": {
-          "percent": 80,
-          "seconds": 20
+          "percent": 70,
+          "seconds": 120
         }
       }
     },
@@ -69,8 +69,8 @@
       ],
       "serviceGoalTemplate": {
         "serviceLevel": {
-          "percent": 80,
-          "seconds": 20
+          "percent": 70,
+          "seconds": 120
         },
         "averageSpeedOfAnswer": {
           "seconds": 30
@@ -108,8 +108,8 @@
       ],
       "serviceGoalTemplate": {
         "serviceLevel": {
-          "percent": 80,
-          "seconds": 20
+          "percent": 70,
+          "seconds": 120
         }
       }
     },
@@ -141,8 +141,8 @@
       ],
       "serviceGoalTemplate": {
         "serviceLevel": {
-          "percent": 80,
-          "seconds": 20
+          "percent": 70,
+          "seconds": 120
         }
       }
     },
@@ -170,8 +170,8 @@
       ],
       "serviceGoalTemplate": {
         "serviceLevel": {
-          "percent": 80,
-          "seconds": 20
+          "percent": 70,
+          "seconds": 120
         }
       }
     },
@@ -203,8 +203,8 @@
       ],
       "serviceGoalTemplate": {
         "serviceLevel": {
-          "percent": 80,
-          "seconds": 20
+          "percent": 70,
+          "seconds": 120
         }
       }
     }
