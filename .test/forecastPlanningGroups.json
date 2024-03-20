@@ -1,0 +1,226 @@
+{
+  "entities": [
+    {
+      "id": "94f233ab-4013-4d88-80bd-88fba1296ce8",
+      "name": "Language Test",
+      "routePaths": [
+        {
+          "queue": {
+            "id": "bfacdae5-64cb-4919-b1bc-6c1e64f6bbc2",
+            "selfUri": "/api/v2/routing/queues/bfacdae5-64cb-4919-b1bc-6c1e64f6bbc2"
+          },
+          "mediaType": "Voice",
+          "language": {
+            "id": "e482c518-884d-40b1-8a18-0ddc39d7f2c1",
+            "selfUri": "/api/v2/routing/languages/e482c518-884d-40b1-8a18-0ddc39d7f2c1"
+          },
+          "skills": []
+        }
+      ],
+      "serviceGoalTemplate": {
+        "serviceLevel": {
+          "percent": 80,
+          "seconds": 20
+        }
+      }
+    },
+    {
+      "id": "7050251f-147b-4c28-adf9-e195d8338155",
+      "name": "Test2",
+      "routePaths": [
+        {
+          "queue": {
+            "id": "ccd45c6d-1e77-4719-85a9-17118fc6c8b2",
+            "selfUri": "/api/v2/routing/queues/ccd45c6d-1e77-4719-85a9-17118fc6c8b2"
+          },
+          "mediaType": "Voice",
+          "skills": [
+            {
+              "id": "16a41e5f-8ace-4a1c-9f70-b19e7b8a2ce0",
+              "selfUri": "/api/v2/routing/skills/16a41e5f-8ace-4a1c-9f70-b19e7b8a2ce0"
+            }
+          ]
+        }
+      ],
+      "serviceGoalTemplate": {
+        "serviceLevel": {
+          "percent": 80,
+          "seconds": 20
+        }
+      }
+    },
+    {
+      "id": "9ac7fd88-f4fa-4249-9777-4c8e4161f87a",
+      "name": "Test",
+      "routePaths": [
+        {
+          "queue": {
+            "id": "2489b6e9-f2b0-458a-b91f-786f7c37ad34",
+            "selfUri": "/api/v2/routing/queues/2489b6e9-f2b0-458a-b91f-786f7c37ad34"
+          },
+          "mediaType": "Voice",
+          "skills": [
+            {
+              "id": "5acf3059-bd14-4809-a2e1-bc7d50c09bff",
+              "selfUri": "/api/v2/routing/skills/5acf3059-bd14-4809-a2e1-bc7d50c09bff"
+            }
+          ]
+        }
+      ],
+      "serviceGoalTemplate": {
+        "serviceLevel": {
+          "percent": 80,
+          "seconds": 20
+        },
+        "averageSpeedOfAnswer": {
+          "seconds": 30
+        },
+        "abandonRate": {
+          "percent": 5
+        }
+      }
+    },
+    {
+      "id": "12f12ad2-4f94-4d22-908e-8a23f04dab0c",
+      "name": "bluthOther",
+      "routePaths": [
+        {
+          "queue": {
+            "id": "86caf05c-a3bb-40eb-9bd3-b9f23bedf048",
+            "selfUri": "/api/v2/routing/queues/86caf05c-a3bb-40eb-9bd3-b9f23bedf048"
+          },
+          "mediaType": "Voice",
+          "skills": []
+        },
+        {
+          "queue": {
+            "id": "86caf05c-a3bb-40eb-9bd3-b9f23bedf048",
+            "selfUri": "/api/v2/routing/queues/86caf05c-a3bb-40eb-9bd3-b9f23bedf048"
+          },
+          "mediaType": "Voice",
+          "skills": [
+            {
+              "id": "bc8514a3-f92f-4d6c-939a-57e83f406c28",
+              "selfUri": "/api/v2/routing/skills/bc8514a3-f92f-4d6c-939a-57e83f406c28"
+            }
+          ]
+        }
+      ],
+      "serviceGoalTemplate": {
+        "serviceLevel": {
+          "percent": 80,
+          "seconds": 20
+        }
+      }
+    },
+    {
+      "id": "b788e61b-6c0a-4cfa-a81d-fb9c62a85e6a",
+      "name": "bluthSales",
+      "routePaths": [
+        {
+          "queue": {
+            "id": "85e5372e-e623-4423-9913-3cda355b40b3",
+            "selfUri": "/api/v2/routing/queues/85e5372e-e623-4423-9913-3cda355b40b3"
+          },
+          "mediaType": "Voice",
+          "skills": [
+            {
+              "id": "b047eb3a-1ffd-41e3-b82b-00ee629d60b0",
+              "selfUri": "/api/v2/routing/skills/b047eb3a-1ffd-41e3-b82b-00ee629d60b0"
+            }
+          ]
+        },
+        {
+          "queue": {
+            "id": "85e5372e-e623-4423-9913-3cda355b40b3",
+            "selfUri": "/api/v2/routing/queues/85e5372e-e623-4423-9913-3cda355b40b3"
+          },
+          "mediaType": "Voice",
+          "skills": []
+        }
+      ],
+      "serviceGoalTemplate": {
+        "serviceLevel": {
+          "percent": 80,
+          "seconds": 20
+        }
+      }
+    },
+    {
+      "id": "1bc1f843-b67e-4411-be5a-f0387e01fc73",
+      "name": "Two skills test",
+      "routePaths": [
+        {
+          "queue": {
+            "id": "86caf05c-a3bb-40eb-9bd3-b9f23bedf048",
+            "selfUri": "/api/v2/routing/queues/86caf05c-a3bb-40eb-9bd3-b9f23bedf048"
+          },
+          "mediaType": "Voice",
+          "skills": [
+            {
+              "id": "6900e1e5-504e-417c-8799-fef763bec772",
+              "selfUri": "/api/v2/routing/skills/6900e1e5-504e-417c-8799-fef763bec772"
+            },
+            {
+              "id": "f443b149-4e55-42f8-ac35-f7156d13bc43",
+              "selfUri": "/api/v2/routing/skills/f443b149-4e55-42f8-ac35-f7156d13bc43"
+            }
+          ]
+        }
+      ],
+      "serviceGoalTemplate": {
+        "serviceLevel": {
+          "percent": 80,
+          "seconds": 20
+        }
+      }
+    },
+    {
+      "id": "5ab27bd5-79df-43a9-871f-9e3c804fbd34",
+      "name": "bluthNewDevelopments",
+      "routePaths": [
+        {
+          "queue": {
+            "id": "bfacdae5-64cb-4919-b1bc-6c1e64f6bbc2",
+            "selfUri": "/api/v2/routing/queues/bfacdae5-64cb-4919-b1bc-6c1e64f6bbc2"
+          },
+          "mediaType": "Voice",
+          "skills": []
+        },
+        {
+          "queue": {
+            "id": "bfacdae5-64cb-4919-b1bc-6c1e64f6bbc2",
+            "selfUri": "/api/v2/routing/queues/bfacdae5-64cb-4919-b1bc-6c1e64f6bbc2"
+          },
+          "mediaType": "Voice",
+          "skills": [
+            {
+              "id": "533c327e-ccc7-4a39-b9fe-4be17b1cab02",
+              "selfUri": "/api/v2/routing/skills/533c327e-ccc7-4a39-b9fe-4be17b1cab02"
+            }
+          ]
+        }
+      ],
+      "serviceGoalTemplate": {
+        "serviceLevel": {
+          "percent": 80,
+          "seconds": 20
+        }
+      }
+    }
+  ],
+  "businessUnitServiceGoalImpact": {
+    "serviceLevel": {
+      "increaseByPercent": 10,
+      "decreaseByPercent": 5
+    },
+    "averageSpeedOfAnswer": {
+      "increaseByPercent": 5,
+      "decreaseByPercent": 5
+    },
+    "abandonRate": {
+      "increaseByPercent": 25,
+      "decreaseByPercent": 100
+    }
+  }
+}

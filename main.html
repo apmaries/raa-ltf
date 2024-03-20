@@ -20,12 +20,16 @@
       }
 
       gux-tab-panel > div {
-        width: 1500px;
+        width: 1700px;
         padding: 20px;
       }
 
       gux-tab-panel > div > div {
         margin-bottom: 20px;
+      }
+
+      gux-button {
+        width: 100px;
       }
 
       fieldset {
@@ -37,6 +41,7 @@
       #forecasts-table td {
         text-align: left;
       }
+
       #forecasts-table th,
       #forecasts-table td {
         text-align: left;
@@ -46,6 +51,14 @@
         display: flex;
         justify-content: space-between;
       }
+
+      .sgt-value {
+        font-weight: bold;
+      }
+
+      .forecast-input-field {
+        width: 80px;
+      }
     </style>
   </head>
   <body>
@@ -53,13 +66,15 @@
       <h1>RAA Long Term Forecast</h1>
 
       <gux-tabs orientation="vertical" style="display: block">
-        <gux-tab-list id="tab-list" slot="tab-list" active-tab="2">
+        <gux-tab-list id="tab-list" slot="tab-list">
           <gux-tab id="inputs-tab" tab-id="1">Inputs</gux-tab>
           <gux-tab id="outputs-tab" tab-id="2">Outputs</gux-tab>
         </gux-tab-list>
         <gux-tab-panel id="inputs-tab-panel" tab-id="1" style="overflow: auto">
           <div class="dropdown-div">
-            <label for="business-unit"><h2>Business Unit:</h2></label>
+            <label for="business-unit"
+              ><h2 id="bu-header">Business Unit:</h2></label
+            >
             <gux-dropdown
               id="business-unit"
               filter-type="starts-with"
@@ -75,7 +90,7 @@
           </div>
 
           <div class="table-div">
-            <label for="forecast"><h2>Forecast:</h2></label>
+            <label for="forecast"><h2 id="fc-header">Forecast:</h2></label>
 
             <gux-table-beta id="forecasts-table" object-table>
               <table slot="data">
@@ -95,7 +110,7 @@
           </div>
 
           <div class="buttons-div">
-            <gux-button id="generate-button" accent="primary"
+            <gux-button id="generate-button" accent="primary" disabled
               >Generate</gux-button
             >
           </div>
@@ -106,15 +121,26 @@
             <gux-dropdown
               id="planning-group"
               filter-type="starts-with"
-              placeholder="Select a Planning Group"
+              placeholder="Select a Planning Group to continue..."
             >
               <gux-listbox
-                id="business-unit-listbox"
+                id="planning-group-listbox"
                 aria-label="Planning Group Selection"
               >
                 <!-- PG objects will be added dynamically -->
               </gux-listbox>
             </gux-dropdown>
+            <div id="pg-service-goals">
+              <h3>Service Goals:</h3>
+              <p>
+                Service Level: <span id="sgt-gos" class="sgt-value"></span>
+                <br />
+                Average Speed of Answer:
+                <span id="sgt-asa" class="sgt-value"></span><br />
+                Abandonment Rate:
+                <span id="sgt-abn" class="sgt-value"></span>
+              </p>
+            </div>
           </div>
           <div class="table-div">
             <label for="forecast"><h2>Outputs:</h2></label>
@@ -136,23 +162,25 @@
                       Forecast AHT
                     </th>
 
-                    <!-- Service Level percentage -->
+                    <!-- Removed unneccessary table columns - these will be the same for every row per Planning Group 
+                    
                     <th data-column-name="sl-threshold" id="slPercentColumn">
                       SL %
                     </th>
 
-                    <!-- Service Level time -->
+                    
                     <th data-column-name="sl-time" id="slTimeColumn">
                       SL time
                     </th>
 
-                    <!-- Average Speed of Answer -->
+                    
                     <th data-column-name="asa" id="asaColumn">ASA</th>
 
-                    <!-- Occupancy percentage -->
+                    
                     <th data-column-name="occupancy" id="occupancyColumn">
                       OCC %
                     </th>
+                    -->
 
                     <!-- Base Full-Time Equivalent -->
                     <th data-column-name="base-fte" id="baseFteColumn">
@@ -172,9 +200,17 @@
                       Req FTE
                     </th>
 
-                    <!-- Actual Full-Time Equivalent -->
+                    <!-- Actual Full-Time Equivalent - can be taken from GC -->
                     <th data-column-name="act-fte" id="actFteColumn">
                       Act FTE
+                    </th>
+
+                    <!-- Predicted Service Level % with Current Full-Time Equivalents -->
+                    <th
+                      data-column-name="sl-pred"
+                      id="slPercentPredictedColumn"
+                    >
+                      Predicted SL%
                     </th>
 
                     <!-- Attrition percentage -->
@@ -192,9 +228,19 @@
                       New Hire FTE
                     </th>
 
+                    <!-- Adjusted Full-Time Equivalents (Current - Attrition + New) -->
+                    <th data-column-name="variance" id="fteAdjustedColumn">
+                      FTE Adjusted
+                    </th>
+
                     <!-- Variance in Required Full-Time Equivalent -->
                     <th data-column-name="variance" id="fteReqPlusMinusColumn">
                       FTE Req +/-
+                    </th>
+
+                    <!-- Projected Service Level % with Adjusted Full-Time Equivalents -->
+                    <th data-column-name="sl-adj" id="slPercentAdjustedColumn">
+                      Adjusted SL%
                     </th>
                   </tr>
                 </thead>
@@ -215,6 +261,13 @@
     <!-- Load the PureCloud platform client library -->
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
 
+    <!-- Load the calculator script -->
+    <script type="module" src="/raa-ltf/src/calculator.js"></script>
+
+    <!-- Load the erlang module -->
+    <script type="module" src="/raa-ltf/src/erlangXL97.js"></script>
+
+    <!-- Script to login with Cloud -->
     <script>
       // wait for dom to load
       document.addEventListener("DOMContentLoaded", async function () {
@@ -245,7 +298,22 @@
         }
       });
     </script>
-    <script>
+
+    <!-- Script to do stuff -->
+    <script type="module">
+      import { aggregate } from "/raa-ltf/src/calculator.js";
+      import { agents, sla } from "/raa-ltf/src/erlangXL97.js";
+
+      // Declare global scope variables
+      let selectedBuId;
+      let selectedBuName;
+      let selectedForecastId;
+      let selectedForecastWeekDate;
+      let selectedPgId;
+      let selectedPgName;
+      let forecastData;
+      let outputsTableBody = document.getElementById("outputs-table-body");
+
       // Check testing mode by protocol. If https then production, else testing
       const isTesting = window.location.protocol !== "https:";
 
@@ -267,6 +335,47 @@
         const tableBody = document.getElementById("forecasts-table-body");
 
         // Functions start here
+
+        // Function to populate dropdowns
+        function populateDropdown(listboxId, data, emptyMessage) {
+          const listbox = document.getElementById(listboxId);
+
+          // If no data found, display message in dropdown
+          if (data.length === 0) {
+            console.log(`[LTF] ${emptyMessage}`);
+            const option = document.createElement("gux-option");
+            option.innerHTML = emptyMessage;
+            listbox.appendChild(option);
+            return;
+          }
+
+          // sort data by name (not case sensitive)
+          data.sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+          );
+
+          // Populate dropdown
+          const fragment = document.createDocumentFragment();
+          data.forEach((item) => {
+            const option = document.createElement("gux-option");
+            option.value = item.id;
+
+            // Remove <!----> if found in item.name
+            item.name = item.name.replace(/<!---->/g, "");
+
+            option.name = item.name;
+            option.innerHTML = item.name;
+
+            // Add serviceGoalTemplate as a data attribute if it exists
+            if (item.serviceGoalTemplate) {
+              option.dataset.serviceGoalTemplate = JSON.stringify(
+                item.serviceGoalTemplate
+              );
+            }
+            fragment.appendChild(option);
+          });
+          listbox.appendChild(fragment);
+        }
 
         // Function to get Business Units
         async function getBusinessUnits() {
@@ -312,83 +421,109 @@
           }
         }
 
-        // Function to initialize the widget
-        async function init() {
+        // Function to initialize the
+        async function initInputsTab() {
           // Get business unit entities
           const businessUnits = await getBusinessUnits();
 
-          // If no business units found, display message in dropdown
-          if (businessUnits.length === 0) {
-            console.log("[LTF] No business units found");
-            const option = document.createElement("gux-option");
-            option.innerHTML = "No business units found";
-            buListbox.appendChild(option);
-            return;
-          }
-
-          // sort data by name (not case sensitive)
-          businessUnits.sort((a, b) =>
-            a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
-          );
-
           // Populate business unit dropdown
-          const fragment = document.createDocumentFragment();
-          businessUnits.forEach((item) => {
-            const option = document.createElement("gux-option");
-            option.value = item.id;
-            option.name = item.name;
-            option.innerHTML = item.name;
-            fragment.appendChild(option);
-          });
-          buListbox.appendChild(fragment);
+          populateDropdown(
+            "business-unit-listbox",
+            businessUnits,
+            "No business units found"
+          );
         }
 
         // Function to generate forecast output
-        async function generate() {
+        async function initOutputsTab() {
+          // Function to get forecast Planning Groups
+          async function getForecastPlanningGroups() {
+            try {
+              let data;
+              if (isTesting) {
+                const response = await fetch(
+                  ".test/forecastPlanningGroups.json"
+                );
+                data = await response.json();
+              } else {
+                data =
+                  await wfmApi.getWorkforcemanagementBusinessunitWeekShorttermforecastPlanninggroups(
+                    selectedBuId,
+                    selectedForecastWeekDate,
+                    selectedForecastId
+                  );
+              }
+              console.log("[LTF] Forecast Planning Groups = ", data);
+              return data.entities || [];
+            } catch (err) {
+              console.error(
+                "[LTF] Error getting forecast planning groups",
+                err
+              );
+              return [];
+            }
+          }
+
+          // Function to get forecast data
+          async function getForecastData() {
+            try {
+              let data;
+              if (isTesting) {
+                const response = await fetch(".test/forecastData.json");
+                data = await response.json();
+              } else {
+                data =
+                  await wfmApi.getWorkforcemanagementBusinessunitWeekShorttermforecastLongtermforecastdata(
+                    selectedBuId,
+                    selectedForecastWeekDate,
+                    selectedForecastId
+                  );
+              }
+              const result = data.result.planningGroups || [];
+              console.log("[LTF] Forecast data returned", result);
+              return result;
+            } catch (err) {
+              console.error("[LTF] Error getting forecast data", err);
+              return [];
+            }
+          }
+
+          // Main generate code
           // Get forecast table selected object by forecast-radio name
           const selectedForecastRadio = document.querySelector(
             "input[name='forecast-radio']:checked"
           );
 
-          console.log("[LTF] Generating forecast data");
+          console.log("[LTF] Generating LTF");
           console.log("[LTF] Selected business unit: ", selectedBuId);
           console.log("[LTF] Selected forecast: ", selectedForecastId);
-
-          // Remove gux-disabled attribute from Outputs tab
-          // TODO: This is not working... not sure why
-          /*var tabPanel = document.querySelector('gux-tab-panel[tab-id="2"]');
-          if (tabPanel) {
-            console.log(
-              "[LTF] Removing gux-disabled attribute from Outputs tab"
-            );
-            tabPanel.removeAttribute("gux-disabled");
-          }*/
+          console.log("[LTF] Selected week date: ", selectedForecastWeekDate);
 
           // Switch to tab 2
           document.querySelector("#outputs-tab").click();
 
-          async function getForecastData() {
-            // Get forecast data
-          }
+          // Get forecast planning groups
+          const forecastPlanningGroups = await getForecastPlanningGroups();
 
-          // Temp function to load forecastData.json
-          async function loadForecastData() {
-            // Load forecast data
-            const response = await fetch("/raa-ltf/.test/forecastData.json");
-            console.log("[LTF] Test data loaded");
-            return response.json();
-          }
+          // Populate forecast planning group dropdown
+          populateDropdown(
+            "planning-group-listbox",
+            forecastPlanningGroups,
+            "No forecast planning groups found"
+          );
+
+          const forecastData = await getForecastData();
+
+          return forecastData;
         }
 
         // Functions end here
 
         // init on page load
-        await init();
+        await initInputsTab();
 
         // Event listeners
         // Event listener for bu-listbox
-        let selectedBuId;
-        let selectedBuName;
         buListbox.addEventListener("change", async (event) => {
           selectedBuId = event.target.value;
 
@@ -402,7 +537,7 @@
           selectedBuName = selectedBuName.replace(/<!---->/g, "");
 
           console.log(
-            `[LTF] Selected business unit: ${selectedBuId} (${selectedBuName})`
+            `[LTF] User selects business unit: ${selectedBuId} (${selectedBuName})`
           );
 
           // Remove existing forecast options
@@ -433,8 +568,9 @@
           const fragment = document.createDocumentFragment();
           forecasts.forEach((item) => {
             const row = document.createElement("tr");
+            // Add a radio button to the first cell of each row where forecastId is the value and weekDate is data-week-date attribute
             row.innerHTML = `
-                <td><input type="radio" name="forecast-radio" value="${item.id}"></td>
+                <td><input type="radio" name="forecast-radio" value="${item.id}" data-week-date="${item.weekDate}"></td>
                 <td>${item.weekDate}</td>
                 <td>${item.weekCount}</td>
                 <td>${item.description}</td>
@@ -450,37 +586,247 @@
           forecastRadios.forEach((radio) => {
             radio.addEventListener("change", (event) => {
               selectedForecastId = event.target.value;
+              selectedForecastWeekDate = event.target.dataset.weekDate;
+
               console.log(
-                `[LTF] Selected forecast: ${selectedForecastId} (${selectedBuName})`
+                `[LTF] User selects forecast: ${selectedForecastWeekDate} - ${selectedForecastId} (${selectedBuName})`
               );
+
+              // Enable generate-button
+              document
+                .getElementById("generate-button")
+                .removeAttribute("disabled");
             });
           });
-
-          // Event listener for generate button
-          document
-            .getElementById("generate-button")
-            .addEventListener("click", () => {
-              // If no forecast is selected, display message
-              if (!selectedBuId || !selectedForecastId) {
-                console.log("[LTF] No forecast selected");
-                alert("Please select a forecast");
-                return;
-              }
-
-              generate(selectedBuId, selectedForecastId);
-            });
-
-          // Event listener for back button
-          document
-            .getElementById("back-button")
-            .addEventListener("click", () => {
-              // Switch to tab 1
-              console.log("[LTF] Switching to tab 1");
-              document.querySelector("#inputs-tab").click();
-            });
         });
+
+        // Event listener for generate-button
+        document
+          .getElementById("generate-button")
+          .addEventListener("click", async () => {
+            forecastData = await initOutputsTab(
+              selectedBuId,
+              selectedForecastId
+            );
+          });
+
+        // Event listener for back button
+        document.getElementById("back-button").addEventListener("click", () => {
+          // Switch to tab 1
+          console.log("[LTF] Switching to tab 1");
+          document.querySelector("#inputs-tab").click();
+        });
+
+        // Event listener for planning-group-listbox
+        const pgListbox = document.getElementById("planning-group-listbox");
+        pgListbox.addEventListener("change", async (event) => {
+          selectedPgId = event.target.value;
+
+          // Get the selected gux-option's innerHTML
+          var selectedOption = Array.from(
+            pgListbox.querySelectorAll("gux-option")
+          ).find((option) => option.value === selectedPgId);
+          selectedPgName = selectedOption ? selectedOption.innerHTML : "";
+
+          // Remove <!----> if found in planningGroupName
+          selectedPgName = selectedPgName.replace(/<!---->/g, "");
+
+          console.log(
+            `[LTF] User selects planning group: ${selectedPgId} (${selectedPgName})`
+          );
+
+          // Get service goals
+          const serviceGoalTemplate = JSON.parse(
+            selectedOption.dataset.serviceGoalTemplate
+          );
+          console.log("[LTF] Service Goal Template = ", serviceGoalTemplate);
+
+          // Clear previous service goals
+          document.getElementById("sgt-gos").innerHTML = "n/a";
+          document.getElementById("sgt-asa").innerHTML = "n/a";
+          document.getElementById("sgt-abn").innerHTML = "n/a";
+
+          let serviceLevelPercent;
+          let serviceLevelSeconds;
+          let averageSpeedOfAnswerSeconds;
+          let abandonmentRatePercent;
+
+          // Populate service goals
+          // Check if serviceGoalTemplate has serviceLevel property
+          if (serviceGoalTemplate.serviceLevel) {
+            serviceLevelPercent = serviceGoalTemplate.serviceLevel.percent;
+            serviceLevelSeconds = serviceGoalTemplate.serviceLevel.seconds;
+
+            document.getElementById(
+              "sgt-gos"
+            ).innerHTML = `${serviceLevelPercent}% in ${serviceLevelSeconds} seconds`;
+          }
+
+          // Check if serviceGoalTemplate has averageSpeedOfAnswer property
+          if (serviceGoalTemplate.averageSpeedOfAnswer) {
+            averageSpeedOfAnswerSeconds =
+              serviceGoalTemplate.averageSpeedOfAnswer.seconds;
+            document.getElementById(
+              "sgt-asa"
+            ).innerHTML = `${averageSpeedOfAnswerSeconds} seconds`;
+          }
+
+          // Check if serviceGoalTemplate has abandonmentRate property
+          if (serviceGoalTemplate.abandonRate) {
+            abandonmentRatePercent = serviceGoalTemplate.abandonRate.percent;
+            document.getElementById(
+              "sgt-abn"
+            ).innerHTML = `${abandonmentRatePercent}%`;
+          }
+
+          console.log("[LTF] Forecast data = ", forecastData);
+
+          // Remove existing output table rows
+
+          outputsTableBody.innerHTML = "";
+
+          // Generate some random numbers for the demo
+          const randOffered =
+            Math.floor(Math.random() * (70000 - 76000 + 1)) + 70000;
+          const randAvgOfferedPerDay =
+            Math.floor(Math.random() * (600 - 650 + 1)) + 600;
+          const randAht = Math.floor(Math.random() * (240 - 260 + 1)) + 240;
+
+          // DEMO DATA
+          const demoData = [
+            {
+              month: "2024-01",
+              offered: 72673,
+              avgOfferedPerDay: 606,
+              aht: 242,
+            },
+            {
+              month: "2024-02",
+              offered: 70152,
+              avgOfferedPerDay: 621,
+              aht: 247,
+            },
+            {
+              month: "2024-03",
+              offered: 73079,
+              avgOfferedPerDay: 619,
+              aht: 256,
+            },
+            {
+              month: "2024-04",
+              offered: randOffered,
+              avgOfferedPerDay: randAvgOfferedPerDay,
+              aht: randAht,
+            },
+          ];
+
+          // Populate outputs table
+          const fragment = document.createDocumentFragment();
+          const rowsPromises = demoData.map(async (item) => {
+            // Calculate the base FTE
+            const baseFte = await agents(
+              serviceLevelPercent,
+              serviceLevelSeconds,
+              item.avgOfferedPerDay,
+              item.aht
+            );
+            console.log(
+              `[LTF] ${item.month} agents(${serviceLevelPercent}, ${serviceLevelSeconds}, ${item.avgOfferedPerDay}, ${item.aht}) = ${baseFte}`
+            );
+
+            // Default shrinkage value
+            const shrinkage = 0.333;
+
+            // Calculate the required FTE to 2 decimal places
+            const requiredFte = (baseFte * (1 + shrinkage)).toFixed(2);
+
+            // Calculate the actual FTE
+            // This can be done as input or taken from GC... though need to look at each agent route paths. Will also be headcount.
+            const actualFte = 75;
+
+            // Initial calculate of predicted service level %
+            const predictedServiceLevel = await sla(
+              actualFte * (1 - shrinkage),
+              serviceLevelSeconds,
+              item.avgOfferedPerDay,
+              item.aht
+            );
+            console.log(
+              `[LTF] ${item.month} sla(${baseFte}, ${serviceLevelSeconds}, ${item.avgOfferedPerDay}, ${item.aht}) = ${predictedServiceLevel}`
+            );
+
+            // Convert predictedServiceLevel to a percentage with 1 decimal place
+            const predictedServiceLevelPercentage = (
+              predictedServiceLevel * 100
+            ).toFixed(1);
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td id="${selectedPgId}_month">${item.month}</td>
+              <td id="${selectedPgId}_offered_${item.month}">${item.offered}</td>
+              <td id="${selectedPgId}_aht_${item.month}">${item.aht}</td>
+              <td id="${selectedPgId}_fteBase_${item.month}">${baseFte}</td>
+              <td id="${selectedPgId}_mseff-${item.month}">1</td>
+              <td id="${selectedPgId}_shrinkage_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_shrPercentInput" class="forecast-input-field" min="0" max="100" step="0.01" value="33.3" /></td>
+              <td id="${selectedPgId}_fteReq_${item.month}">${requiredFte}</td>
+              <td id="${selectedPgId}_fteAct_${item.month}">${actualFte}</td>
+              <td id="${selectedPgId}_slaPred_${item.month}">${predictedServiceLevelPercentage}%</td>
+              <td id="${selectedPgId}_attrPercent_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_attrPercentInput" class="forecast-input-field" min="0" max="100" step="0.01" value="0" /></td>
+              <td id="${selectedPgId}_attrAbs_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_attrAbsoluteInput" class="forecast-input-field" min="0" max="100" step="1" value="0" /></td>
+              <td id="${selectedPgId}_newFte_${item.month}"><input type="number" id="${selectedPgId}-${item.month}-newFte-input" class="forecast-input-field" min="0" max="100" step="1" value="0" /></td>
+              <td id="${selectedPgId}_adjFte_${item.month}"></td>
+              <td id="${selectedPgId}_diffFte_${item.month}"></td>
+              <td id="${selectedPgId}_slaAdj_${item.month}">%</td>
+
+            `;
+            return row;
+          });
+
+          Promise.all(rowsPromises).then((rows) => {
+            rows.forEach((row) => fragment.appendChild(row));
+            outputsTableBody.appendChild(fragment);
+          });
+        });
+
+        // Attach an event listener to the table body
+        outputsTableBody.addEventListener("input", function (event) {
+          console.warn("event = ", event);
+          console.warn("event.target.id = ", event.target.id);
+          // Check if the event target is a shrinkage input
+          if (event.target.id.endsWith("_shrPercentInput")) {
+            // Get the current month from the input id
+            const currentMonth = event.target.id.split("_")[1];
+            console.warn("currentMonth = ", currentMonth);
+            console.warn("selectedPgId = ", selectedPgId);
+
+            // Get the current base FTE value
+            console.warn(
+              "element id to select = ",
+              `${selectedPgId}_fteBase_${currentMonth}`
+            );
+            const baseFte = parseFloat(
+              document.getElementById(`${selectedPgId}_fteBase_${currentMonth}`)
+                .textContent
+            );
+            console.warn("fteBase = ", baseFte);
+
+            // Get the current shrinkage value
+            const shrinkage = parseFloat(event.target.value) / 100;
+            console.warn("shrinkage = ", shrinkage);
+
+            // Calculate the new required FTE value
+            const requiredFte = baseFte * (1 + shrinkage);
+            console.warn("requiredFte = ", requiredFte);
+
+            // Update the required FTE cell with the new value
+            document.getElementById(
+              `${selectedPgId}_fteReq_${currentMonth}`
+            ).textContent = requiredFte.toFixed(2);
+          }
+        });
+
+        // Event listener for export button
       });
     </script>
-    <script type="module" src="/raa-ltf/src/erlangXL97.js"></script>
   </body>
 </html>

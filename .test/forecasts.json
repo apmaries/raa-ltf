@@ -47,6 +47,29 @@
       "selfUri": "/api/v2/workforcemanagement/businessunits/7e5d7b10-9086-4c53-8458-7a24df8b902b/weeks/2024-03-25/shorttermforecasts/d8a7926c-a41b-408e-ba6a-dcaf56174838"
     },
     {
+      "id": "a8c10a99-5c11-4684-9e4c-dbc1120088c5",
+      "weekDate": "2024-03-25",
+      "weekCount": 104,
+      "creationMethod": "Advanced",
+      "description": "Andy new test",
+      "legacy": false,
+      "metadata": {
+        "version": 1,
+        "modifiedBy": {
+          "id": "be1c20dd-f6a5-457e-bba4-aaabe81e1ceb",
+          "selfUri": "/api/v2/users/be1c20dd-f6a5-457e-bba4-aaabe81e1ceb"
+        },
+        "dateModified": "2024-03-19T02:54:36.700Z",
+        "createdBy": {
+          "id": "be1c20dd-f6a5-457e-bba4-aaabe81e1ceb",
+          "selfUri": "/api/v2/users/be1c20dd-f6a5-457e-bba4-aaabe81e1ceb"
+        },
+        "dateCreated": "2024-03-19T02:54:36.700Z"
+      },
+      "canUseForScheduling": true,
+      "selfUri": "/api/v2/workforcemanagement/businessunits/7e5d7b10-9086-4c53-8458-7a24df8b902b/weeks/2024-03-25/shorttermforecasts/a8c10a99-5c11-4684-9e4c-dbc1120088c5"
+    },
+    {
       "id": "3dd055a5-8b36-4975-b4d4-5542f513d710",
       "weekDate": "2024-01-15",
       "weekCount": 1,
