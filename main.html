@@ -715,6 +715,11 @@
         // Event listeners
         // Event listener for bu-listbox
         buListbox.addEventListener("change", async (event) => {
+          // Reset generate-button to disabled
+          document
+            .getElementById("generate-button")
+            .setAttribute("disabled", "");
+
           selectedBuId = event.target.value;
 
           // Get the selected gux-option's innerHTML
