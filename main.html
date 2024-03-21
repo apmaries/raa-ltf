@@ -527,6 +527,8 @@
         // Function to populate dropdowns
         function populateDropdown(listboxId, data, emptyMessage) {
           const listbox = document.getElementById(listboxId);
+          // Clear existing options
+          listbox.innerHTML = "";
 
           // If no data found, display message in dropdown
           if (data.length === 0) {
