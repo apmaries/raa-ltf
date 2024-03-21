@@ -32,6 +32,10 @@
         width: 100px;
       }
 
+      gux-table-beta table th {
+        padding-right: 12px;
+      }
+
       fieldset {
         background-color: white;
         width: 80%;
@@ -58,6 +62,12 @@
 
       .forecast-input-field {
         width: 80px;
+      }
+
+      .flex-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
     </style>
   </head>
@@ -144,103 +154,278 @@
           </div>
           <div class="table-div">
             <label for="forecast"><h2>Outputs:</h2></label>
+            <div id="disclaimer">
+              <p style="color: red">
+                <gux-icon icon-name="warning" decorative="true"></gux-icon>
+                Staffing & performance forecasts will differ from what is
+                calculated later by GC WFM
+              </p>
+            </div>
 
             <gux-table-beta id="outputs-table" object-table>
               <table slot="data">
                 <thead>
                   <tr>
                     <!-- Month of the forecast -->
-                    <th data-column-name="cal-month" id="monthColumn">Month</th>
+                    <th data-column-name="cal-month" id="monthColumn">
+                      <div class="flex-container">
+                        <div>Month</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip>Calendar month "YYYY-MM"</gux-tooltip>
+                        </div>
+                      </div>
+                    </th>
 
                     <!-- Forecasted number of calls offered -->
                     <th data-column-name="offered" id="forecastOfferedColumn">
-                      Forecast Offered
+                      <div class="flex-container">
+                        <div>Forecast Offered</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Forecast aggregate offered volume</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Forecasted Average Handling Time -->
                     <th data-column-name="aht" id="forecastAhtColumn">
-                      Forecast AHT
+                      <div class="flex-container">
+                        <div>Forecast AHT</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip>Forecasted weighted AHT</gux-tooltip>
+                        </div>
+                      </div>
                     </th>
-
-                    <!-- Removed unneccessary table columns - these will be the same for every row per Planning Group 
-                    
-                    <th data-column-name="sl-threshold" id="slPercentColumn">
-                      SL %
-                    </th>
-
-                    
-                    <th data-column-name="sl-time" id="slTimeColumn">
-                      SL time
-                    </th>
-
-                    
-                    <th data-column-name="asa" id="asaColumn">ASA</th>
-
-                    
-                    <th data-column-name="occupancy" id="occupancyColumn">
-                      OCC %
-                    </th>
-                    -->
 
                     <!-- Base Full-Time Equivalent -->
                     <th data-column-name="base-fte" id="baseFteColumn">
-                      Base FTE
+                      <div class="flex-container">
+                        <div>Base FTE</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Base Full-Time Equivalent - calculated by Erlang
+                            'Agents' formula</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Mean Square Error of Forecast -->
-                    <th data-column-name="mseff" id="mseffColumn">MSEFF</th>
+                    <th data-column-name="mseff" id="mseffColumn">
+                      <div class="flex-container">
+                        <div>MSEFF</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Multi-skilled efficiency? Need to confirm what (if
+                            anything should happen with this)</gux-tooltip
+                          >
+                        </div>
+                      </div>
+                    </th>
 
                     <!-- Shrinkage percentage -->
                     <th data-column-name="shrinkage" id="shrinkageColumn">
-                      Shrinkage
+                      <div class="flex-container">
+                        <div>Shrinkage</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Shrinkage percentage - default value could be
+                            hardcoded, supplied as user variable on Inputs tab
+                            or possibly taken from GC (Default shrinkage per
+                            MU)</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Required Full-Time Equivalent -->
                     <th data-column-name="req-fte" id="reqFteColumn">
-                      Req FTE
+                      <div class="flex-container">
+                        <div>Req FTE</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Required Full-Time Equivalent - calculated as Base
+                            FTE + Shrinkage</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Actual Full-Time Equivalent - can be taken from GC -->
                     <th data-column-name="act-fte" id="actFteColumn">
-                      Act FTE
+                      <div class="flex-container">
+                        <div>Act FTE</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Actual Full-Time Equivalent - can be taken from GC
+                            to start (need to look up all agents PG memberships
+                            through queues / skills / languages). Dynamically
+                            updated after adjustments</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
-                    <!-- Predicted Service Level % with Current Full-Time Equivalents -->
+                    <!-- Predicted Service Level % with Actual Full-Time Equivalents -->
                     <th
                       data-column-name="sl-pred"
                       id="slPercentPredictedColumn"
                     >
-                      Predicted SL%
+                      <div class="flex-container">
+                        <div>Predicted SL%</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Predicted Service Level % with Actual Full-Time
+                            Equivalents - calculated by Erlang 'SLA'
+                            formula</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Attrition percentage -->
                     <th data-column-name="attr-per" id="attritionPercentColumn">
-                      Attrition %
+                      <div class="flex-container">
+                        <div>Attrition %</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Attrition percentage - dynamically updates from
+                            changes in Absolute Attrition and updates FTE
+                            Adjusted, FTE Difference, Adjusted SL% and future
+                            months Actual FTE</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Absolute Attrition -->
                     <th data-column-name="attr-per" id="absAttritionColumn">
-                      ABS Attrition
+                      <div class="flex-container">
+                        <div>ABS Attrition</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Absolute attrition - dynamically updates from
+                            changes in Attrition % and updates FTE Adjusted, FTE
+                            Difference, Adjusted SL% and future months Actual
+                            FTE</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- New Hire Full-Time Equivalent -->
                     <th data-column-name="new-fte" id="newHireFteColumn">
-                      New Hire FTE
+                      <div class="flex-container">
+                        <div>New Hire FTE</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >New Hire Full-Time Equivalent - dynamically updates
+                            FTE Adjusted, FTE Difference, Adjusted SL% and
+                            future months Actual FTE</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Adjusted Full-Time Equivalents (Current - Attrition + New) -->
                     <th data-column-name="variance" id="fteAdjustedColumn">
-                      FTE Adjusted
+                      <div class="flex-container">
+                        <div>FTE Adjusted</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Adjusted Full-Time Equivalents (Current - Attrition
+                            + New)</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Variance in Required Full-Time Equivalent -->
-                    <th data-column-name="variance" id="fteReqPlusMinusColumn">
-                      FTE Req +/-
+                    <th data-column-name="variance" id="fteReqDifference">
+                      <div class="flex-container">
+                        <div>FTE Difference</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Variance in FTE - calculated as Required -
+                            Actual</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
 
                     <!-- Projected Service Level % with Adjusted Full-Time Equivalents -->
                     <th data-column-name="sl-adj" id="slPercentAdjustedColumn">
-                      Adjusted SL%
+                      <div class="flex-container">
+                        <div>Adjusted SL%</div>
+                        <div>
+                          <gux-icon
+                            icon-name="help"
+                            screenreader-text="help-icon"
+                          ></gux-icon
+                          ><gux-tooltip
+                            >Projected Service Level % with Adjusted Full-Time
+                            Equivalents - calculated by Erlang 'SLA'
+                            formula</gux-tooltip
+                          >
+                        </div>
+                      </div>
                     </th>
                   </tr>
                 </thead>
@@ -743,7 +928,7 @@
 
             // Calculate the actual FTE
             // This can be done as input or taken from GC... though need to look at each agent route paths. Will also be headcount.
-            const actualFte = 49;
+            const actualFte = 49.0;
 
             // Initial calculate of predicted service level % using (current fte - shrinkage)
             const predictedServiceLevel = await sla(
@@ -1101,7 +1286,6 @@
             console.log("[LTF] Exporting data");
           });
 
-        // TODO: Make Adjusted SL% dynamic
         // TODO: Update export functionality
         // TODO: Probably move / update most of this stuff to a standalone JS file and refactor to improve readability
         // TODO: Probably need to force download service of forecast data to ensure a consistent response for small and large datasets
