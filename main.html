@@ -162,14 +162,14 @@
                 Staffing & performance forecasts will differ from what is
                 calculated later by GC WFM
               </p>
-              <p style="color: red">
+              <p style="color: goldenrod">
                 <gux-icon icon-name="warning" decorative="true"></gux-icon>
                 Input fields for Shrinkage, Attrition and New Hires are editable
                 and will highlight with red border once modified. They will also
                 update the FTE Adjusted, FTE Difference, Adjusted SL% and future
                 months Actual FTE
               </p>
-              <p style="color: red">
+              <p style="color: goldenrod">
                 <gux-icon icon-name="warning" decorative="true"></gux-icon>
                 For demo purposes, the first 3 months are populated with static
                 data from Cat's Excel doc and the last month is populated with
@@ -943,10 +943,10 @@
             );
 
             // Default shrinkage value
-            const shrinkage = 0.12;
+            const shrinkage = 12;
 
             // Calculate the required FTE to 2 decimal places
-            const requiredFte = (baseFte * (1 + shrinkage)).toFixed(1);
+            const requiredFte = (baseFte * (1 + shrinkage / 100)).toFixed(1);
 
             // Calculate the actual FTE
             // This can be done as input or taken from GC... though need to look at each agent route paths. Will also be headcount.
@@ -954,7 +954,7 @@
 
             // Initial calculate of predicted service level % using (current fte - shrinkage)
             const predictedServiceLevel = await sla(
-              actualFte * (1 - shrinkage),
+              actualFte * (1 - shrinkage / 100),
               serviceLevelSeconds,
               item.avgOfferedPerDay,
               item.aht
