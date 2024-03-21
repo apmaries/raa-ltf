@@ -269,12 +269,11 @@
 
     <!-- Script to login with Cloud -->
     <script>
-      // wait for dom to load
-      document.addEventListener("DOMContentLoaded", async function () {
+      (async function () {
         // Check testing mode by protocol. If https then production, else testing
-        const isTesting = window.location.protocol !== "https:";
+        window.isTesting = window.location.protocol !== "https:";
 
-        if (isTesting) {
+        if (window.isTesting) {
           console.log("[LTF] Testing mode");
         } else {
           console.log("[LTF] Production mode");
@@ -296,7 +295,7 @@
             console.error("[LTF] Error logging in", e);
           }
         }
-      });
+      })();
     </script>
 
     <!-- Script to do stuff -->
@@ -319,7 +318,7 @@
       let outputsTableBody = document.getElementById("outputs-table-body");
 
       // Check testing mode by protocol. If https then production, else testing
-      const isTesting = window.location.protocol !== "https:";
+      // const isTesting = window.location.protocol !== "https:";
 
       window.onerror = function (message, source, lineno, colno, error) {
         console.error(
@@ -385,7 +384,7 @@
         async function getBusinessUnits() {
           try {
             let data;
-            if (isTesting) {
+            if (window.isTesting) {
               const response = await fetch(".test/businessUnits.json");
               data = await response.json();
             } else {
@@ -403,7 +402,7 @@
         async function getForecasts(selectedBuId) {
           try {
             let data;
-            if (isTesting) {
+            if (window.isTesting) {
               const response = await fetch(".test/forecasts.json");
               data = await response.json();
             } else {
@@ -444,7 +443,7 @@
           async function getForecastPlanningGroups() {
             try {
               let data;
-              if (isTesting) {
+              if (window.isTesting) {
                 const response = await fetch(
                   ".test/forecastPlanningGroups.json"
                 );
@@ -472,7 +471,7 @@
           async function getForecastData() {
             try {
               let data;
-              if (isTesting) {
+              if (window.isTesting) {
                 const response = await fetch(".test/forecastData.json");
                 data = await response.json();
               } else {
@@ -722,22 +721,25 @@
           // Populate outputs table
           const fragment = document.createDocumentFragment();
           const rowsPromises = demoData.map(async (item) => {
+            // Convert service level percent to a decimal
+            const serviceLevelPercentDecimal = serviceLevelPercent / 100;
+
             // Calculate the base FTE
             const baseFte = await agents(
-              serviceLevelPercent,
+              serviceLevelPercentDecimal,
               serviceLevelSeconds,
               item.avgOfferedPerDay,
               item.aht
             );
             console.log(
-              `[LTF] ${item.month} agents(${serviceLevelPercent}, ${serviceLevelSeconds}, ${item.avgOfferedPerDay}, ${item.aht}) = ${baseFte}`
+              `[LTF] ${item.month} =Agents(${serviceLevelPercentDecimal}, ${serviceLevelSeconds}, ${item.avgOfferedPerDay}, ${item.aht}) = ${baseFte}`
             );
 
             // Default shrinkage value
-            const shrinkage = 0.333;
+            const shrinkage = 0.0;
 
             // Calculate the required FTE to 2 decimal places
-            const requiredFte = (baseFte * (1 + shrinkage)).toFixed(2);
+            const requiredFte = (baseFte * (1 + shrinkage)).toFixed(1);
 
             // Calculate the actual FTE
             // This can be done as input or taken from GC... though need to look at each agent route paths. Will also be headcount.
@@ -751,7 +753,7 @@
               item.aht
             );
             console.log(
-              `[LTF] ${item.month} sla(${baseFte}, ${serviceLevelSeconds}, ${item.avgOfferedPerDay}, ${item.aht}) = ${predictedServiceLevel}`
+              `[LTF] ${item.month} =SLA(${baseFte}, ${serviceLevelSeconds}, ${item.avgOfferedPerDay}, ${item.aht}) = ${predictedServiceLevel}`
             );
 
             // Convert predictedServiceLevel to a percentage with 1 decimal place
@@ -760,10 +762,10 @@
             ).toFixed(1);
 
             // Initial calculate of FTE Adjusted
-            const fteAdjusted = actualFte.toFixed(2);
+            const fteAdjusted = actualFte.toFixed(1);
 
             // Initial calculate of FTE Difference
-            const fteDifference = (fteAdjusted - requiredFte).toFixed(2);
+            const fteDifference = (fteAdjusted - requiredFte).toFixed(1);
 
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -772,16 +774,16 @@
               <td id="${selectedPgId}_aht_${item.month}">${item.aht}</td>
               <td id="${selectedPgId}_fteBase_${item.month}">${baseFte}</td>
               <td id="${selectedPgId}_mseff-${item.month}">1</td>
-              <td id="${selectedPgId}_shrinkage_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_shrPercentInput" class="forecast-input-field" min="0" max="100" step="0.1" value="33.3" /></td>
+              <td id="${selectedPgId}_shrinkage_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_shrPercentInput" class="forecast-input-field" min="0" max="100" step="1" value=${shrinkage} /></td>
               <td id="${selectedPgId}_fteReq_${item.month}">${requiredFte}</td>
               <td id="${selectedPgId}_fteAct_${item.month}">${actualFte}</td>
               <td id="${selectedPgId}_slaPred_${item.month}">${predictedServiceLevelPercentage}%</td>
-              <td id="${selectedPgId}_attrPercent_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_attrPercentInput" class="forecast-input-field" min="0" max="100" step="1" value="0.00" /></td>
-              <td id="${selectedPgId}_attrAbs_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_attrAbsoluteInput" class="forecast-input-field" min="0" max="100" step="1" value="0.00" /></td>
+              <td id="${selectedPgId}_attrPercent_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_attrPercentInput" class="forecast-input-field" min="0" max="100" step="1" value="0.0" /></td>
+              <td id="${selectedPgId}_attrAbs_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_attrAbsoluteInput" class="forecast-input-field" min="0" max="100" step="1" value="0.0" /></td>
               <td id="${selectedPgId}_fteNew_${item.month}"><input type="number" id="${selectedPgId}_${item.month}_newFteInput" class="forecast-input-field" min="0" max="100" step="1" value="0" /></td>
               <td id="${selectedPgId}_fteAdj_${item.month}">${fteAdjusted}</td>
               <td id="${selectedPgId}_fteDiff_${item.month}">${fteDifference}</td>
-              <td id="${selectedPgId}_slaAdj_${item.month}">%</td>
+              <td id="${selectedPgId}_slaAdj_${item.month}">${predictedServiceLevelPercentage}%</td>
             `;
             return row;
           });
@@ -825,7 +827,7 @@
                 );
                 diffFteCell.textContent = (
                   parseFloat(newBaseFTE) - parseFloat(reqFteCell.textContent)
-                ).toFixed(2);
+                ).toFixed(1);
               }
             });
           }
@@ -833,10 +835,28 @@
           // Get the current month from the input id
           const currentMonth = event.target.id.split("_")[1];
 
+          // Get the current shrinkage value
+          const shrinkage = parseFloat(event.target.value) / 100;
+          console.warn("shrinkage = ", shrinkage);
+
+          // Get the curent offered and aht values for updating SL%
+          const avgOfferedPerDay = document.getElementById(
+            `${selectedPgId}_offered_${currentMonth}`
+          ).dataset.avgOfferedPerDay;
+          const aht = document.getElementById(
+            `${selectedPgId}_aht_${currentMonth}`
+          ).textContent;
+
           // Get the current FTE value - used for SL% and Adjusted FTE calculations
           const fteCurrent = document.getElementById(
             `${selectedPgId}_fteAct_${currentMonth}`
           ).textContent;
+
+          // Get the adjusted FTE element and value
+          const fteAdjustedEle = document.getElementById(
+            `${selectedPgId}_fteAdj_${currentMonth}`
+          );
+          const currentFteAdjusted = parseFloat(fteAdjustedEle.textContent);
 
           // Get the FTE Difference element and value
           const fteDifferenceEle = document.getElementById(
@@ -844,11 +864,17 @@
           );
           const fteDifference = parseFloat(fteDifferenceEle.textContent);
 
+          // Get the adjusted SL% element
+          const adjSlaEle = document.getElementById(
+            `${selectedPgId}_slaAdj_${currentMonth}`
+          );
+
           // Temp logging
           console.warn("event = ", event);
           console.warn("event.target.id = ", event.target.id);
           console.warn("currentMonth = ", currentMonth);
           console.warn("selectedPgId = ", selectedPgId);
+          console.warn("shrinkage = ", shrinkage);
           console.warn("fteCurrent = ", fteCurrent);
           console.warn("fteDifference = ", fteDifference);
 
@@ -859,17 +885,6 @@
               document.getElementById(`${selectedPgId}_fteBase_${currentMonth}`)
                 .textContent
             );
-
-            // Get the current shrinkage value
-            const shrinkage = parseFloat(event.target.value) / 100;
-
-            // Get the remaining curent values for updating SL%
-            const avgOfferedPerDay = document.getElementById(
-              `${selectedPgId}_offered_${currentMonth}`
-            ).dataset.avgOfferedPerDay;
-            const aht = document.getElementById(
-              `${selectedPgId}_aht_${currentMonth}`
-            ).textContent;
 
             // Calculate the new required FTE value
             const updatedReqFte = baseFte * (1 + shrinkage);
@@ -882,7 +897,7 @@
               aht
             );
             console.log(
-              `[LTF] ${currentMonth} sla(${
+              `[LTF] ${currentMonth} predicted =SLA(${
                 fteCurrent * (1 - shrinkage)
               }, ${serviceLevelSeconds}, ${avgOfferedPerDay}, ${aht}) = ${predictedServiceLevel}`
             );
@@ -890,7 +905,7 @@
             // Update the required FTE cell with the new value
             document.getElementById(
               `${selectedPgId}_fteReq_${currentMonth}`
-            ).textContent = updatedReqFte.toFixed(2);
+            ).textContent = updatedReqFte.toFixed(1);
 
             // Update the predicted service level cell with the new value
             document.getElementById(
@@ -901,6 +916,24 @@
             fteDifferenceEle.textContent = (fteCurrent - updatedReqFte).toFixed(
               2
             );
+
+            // Calculate the adjusted service level value
+            const adjustedServiceLevel = await sla(
+              currentFteAdjusted * (1 - shrinkage),
+              serviceLevelSeconds,
+              avgOfferedPerDay,
+              aht
+            );
+            console.log(
+              `[LTF] ${currentMonth} adjusted =SLA(${
+                currentFteAdjusted * (1 - shrinkage)
+              }, ${serviceLevelSeconds}, ${avgOfferedPerDay}, ${aht}) = ${adjustedServiceLevel}`
+            );
+
+            // Update the adjusted service level cell with the new value
+            adjSlaEle.textContent = `${(adjustedServiceLevel * 100).toFixed(
+              1
+            )}%`;
           }
 
           // Check if the event target is attrition %
@@ -920,23 +953,41 @@
             // Update the absolute attrition input with the new value
             document.getElementById(
               `${selectedPgId}_${currentMonth}_attrAbsoluteInput`
-            ).value = absAttrition.toFixed(2);
+            ).value = absAttrition.toFixed(1);
 
             // Calculate the new adjusted FTE value
-            const fteAdjusted = fteCurrent - absAttrition;
+            const updatedFteAdjusted = fteCurrent - absAttrition;
 
             // Update the adjusted FTE cell with the new value
             document.getElementById(
               `${selectedPgId}_fteAdj_${currentMonth}`
-            ).textContent = fteAdjusted.toFixed(2);
+            ).textContent = updatedFteAdjusted.toFixed(1);
 
             // Call the function to update the base FTE for all subsequent months
-            updateActFTE(currentMonth, fteAdjusted.toFixed(2));
+            updateActFTE(currentMonth, updatedFteAdjusted.toFixed(1));
 
-            // Calculate the new FTE Difference value
+            // Calculate the new FTE Difference value and update the cell
             fteDifferenceEle.textContent = (
-              fteAdjusted - currentReqFte
-            ).toFixed(2);
+              updatedFteAdjusted - currentReqFte
+            ).toFixed(1);
+
+            // Calculate the adjusted service level value
+            const adjustedServiceLevel = await sla(
+              updatedFteAdjusted * (1 - shrinkage),
+              serviceLevelSeconds,
+              avgOfferedPerDay,
+              aht
+            );
+            console.log(
+              `[LTF] ${currentMonth} adjusted =SLA(${
+                updatedFteAdjusted * (1 - shrinkage)
+              }, ${serviceLevelSeconds}, ${avgOfferedPerDay}, ${aht}) = ${adjustedServiceLevel}`
+            );
+
+            // Update the adjusted service level cell with the new value
+            adjSlaEle.textContent = `${(adjustedServiceLevel * 100).toFixed(
+              1
+            )}%`;
           }
 
           // Check if the event target is attrition abs
@@ -954,37 +1005,49 @@
             const attritionPercent = absAttrition / fteCurrent;
 
             // Calculate the new adjusted FTE value
-            const fteAdjusted = fteCurrent - absAttrition;
+            const updatedFteAdjusted = fteCurrent - absAttrition;
 
             // Update the attrition % input with the new value
             document.getElementById(
               `${selectedPgId}_${currentMonth}_attrPercentInput`
-            ).value = (attritionPercent * 100).toFixed(2);
+            ).value = (attritionPercent * 100).toFixed(1);
 
             // Update the adjusted FTE cell with the new value
             document.getElementById(
               `${selectedPgId}_fteAdj_${currentMonth}`
-            ).textContent = fteAdjusted.toFixed(2);
+            ).textContent = updatedFteAdjusted.toFixed(1);
 
             // Call the function to update the base FTE for all subsequent months
-            updateActFTE(currentMonth, fteAdjusted.toFixed(2));
+            updateActFTE(currentMonth, updatedFteAdjusted.toFixed(1));
 
             // Calculate the new FTE Difference value
             fteDifferenceEle.textContent = (
-              fteAdjusted - currentReqFte
-            ).toFixed(2);
+              updatedFteAdjusted - currentReqFte
+            ).toFixed(1);
+
+            // Calculate the adjusted service level value
+            const adjustedServiceLevel = await sla(
+              updatedFteAdjusted * (1 - shrinkage),
+              serviceLevelSeconds,
+              avgOfferedPerDay,
+              aht
+            );
+            console.log(
+              `[LTF] ${currentMonth} adjusted =SLA(${
+                updatedFteAdjusted * (1 - shrinkage)
+              }, ${serviceLevelSeconds}, ${avgOfferedPerDay}, ${aht}) = ${adjustedServiceLevel}`
+            );
+
+            // Update the adjusted service level cell with the new value
+            adjSlaEle.textContent = `${(adjustedServiceLevel * 100).toFixed(
+              1
+            )}%`;
           }
 
           // Check if the event target is new hire
           else if (event.target.id.endsWith("_newFteInput")) {
             // Get the current new hire FTE value
             const newHireFte = parseFloat(event.target.value);
-
-            // Get the current adjusted FTE value
-            const fteAdjusted = parseFloat(
-              document.getElementById(`${selectedPgId}_fteAdj_${currentMonth}`)
-                .textContent
-            );
 
             // Calculate the new adjusted FTE value
             const updatedFteAdjusted =
@@ -996,10 +1059,10 @@
             // Update the adjusted FTE cell with the new value
             document.getElementById(
               `${selectedPgId}_fteAdj_${currentMonth}`
-            ).textContent = updatedFteAdjusted.toFixed(2);
+            ).textContent = updatedFteAdjusted.toFixed(1);
 
             // Call the function to update the base FTE for all subsequent months
-            updateActFTE(currentMonth, fteAdjusted.toFixed(2));
+            updateActFTE(currentMonth, updatedFteAdjusted.toFixed(1));
 
             // Calculate the new FTE Difference value
             fteDifferenceEle.textContent = (
@@ -1009,7 +1072,25 @@
                   `${selectedPgId}_fteReq_${currentMonth}`
                 ).textContent
               )
-            ).toFixed(2);
+            ).toFixed(1);
+
+            // Calculate the adjusted service level value
+            const adjustedServiceLevel = await sla(
+              updatedFteAdjusted * (1 - shrinkage),
+              serviceLevelSeconds,
+              avgOfferedPerDay,
+              aht
+            );
+            console.log(
+              `[LTF] ${currentMonth} adjusted =SLA(${
+                updatedFteAdjusted * (1 - shrinkage)
+              }, ${serviceLevelSeconds}, ${avgOfferedPerDay}, ${aht}) = ${adjustedServiceLevel}`
+            );
+
+            // Update the adjusted service level cell with the new value
+            adjSlaEle.textContent = `${(adjustedServiceLevel * 100).toFixed(
+              1
+            )}%`;
           }
         });
 
