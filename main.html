@@ -62,6 +62,7 @@
 
       .forecast-input-field {
         width: 80px;
+        color: darkgrey;
         border: 1px solid rgb(123, 161, 128);
       }
 
@@ -1086,8 +1087,9 @@
 
           // Check if the event target is a shrinkage input
           if (event.target.id.endsWith("_shrPercentInput")) {
-            // Highlight that this is the source of the change by adding a border
+            // Highlight that this has been modified
             event.target.style.border = "1px solid red";
+            event.target.style.color = "black";
 
             // Get the current base FTE value
             const baseFte = parseFloat(
@@ -1147,8 +1149,9 @@
 
           // Check if the event target is attrition %
           else if (event.target.id.endsWith("_attrPercentInput")) {
-            // Highlight that this is the source of the change by adding a border
+            // Highlight that this has been modified
             event.target.style.border = "1px solid red";
+            event.target.style.color = "black";
 
             // Remove the style attribute from Absolute Attrition input (if exists)
             document.getElementById(
@@ -1209,8 +1212,9 @@
 
           // Check if the event target is attrition abs
           else if (event.target.id.endsWith("_attrAbsoluteInput")) {
-            // Highlight that this is the source of the change by adding a border
+            // Highlight that this has been modified
             event.target.style.border = "1px solid red";
+            event.target.style.color = "black";
 
             // Remove the borderfrom Absolute Attrition input (if exists)
             document.getElementById(
@@ -1271,8 +1275,9 @@
 
           // Check if the event target is new hire
           else if (event.target.id.endsWith("_newFteInput")) {
-            // Highlight that this is the source of the change by adding a border
+            // Highlight that this has been modified
             event.target.style.border = "1px solid red";
+            event.target.style.color = "black";
 
             // Get the current new hire FTE value
             const newHireFte = parseFloat(event.target.value);
